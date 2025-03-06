@@ -46,6 +46,7 @@
         .top-buttons {
             display: flex;
             gap: 20px;
+            position: relative;
         }
         .top-buttons button {
             padding: 10px 20px;
@@ -54,7 +55,22 @@
             background-color: #ff9900;
             color: white;
             cursor: pointer;
-            font-size: 14px;   
+            font-size: 14px;
+            position: relative;
+        }
+        .top-buttons button::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background-color: yellow;
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s;
+        }
+        .top-buttons button:hover::after {
+            width: 100%;
         }
         .search-button{
             margin: 0px;
