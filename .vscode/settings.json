@@ -1,5 +1,6 @@
 {
     "liveshare.allowGuestDebugControl": true,
     "liveshare.allowGuestTaskControl": true,
-    "liveshare.alwaysFollowHost": true
+    "liveshare.alwaysFollowHost": true,
+    "liveServer.settings.port": 5501
 }

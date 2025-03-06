@@ -100,9 +100,7 @@
             padding: 10px;
             display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
             position: absolute;
-            z-index: 10;
-           
-           
+            z-index: 10;           
         }   
         .search-item {
             padding: 5px;
@@ -138,10 +136,8 @@
         <div class="container">
             <h2>ส่วนผสม</h2>
             <div id="ingredients-container">
-                <input type="text" placeholder="เช่น เนื้อหมู">
-                <input type="text" placeholder="เช่น 1 กิโลกรัม">
+                <input type="text" placeholder="เช่น เนื้อหมู 1 กิโลกรัม ต่อลงมา">
             </div>
-            <button onclick="addIngredient()">+ เพิ่มส่วนผสม</button>
         </div>
     </div>
     
@@ -149,24 +145,21 @@
         <div class="container">
             <h2>วิธีการทำ</h2>
             <div id="instructions-container">
-                <textarea placeholder="ขั้นตอนที่ 1"></textarea>
-                <input type="file" accept="image/*">
-                <textarea placeholder="ขั้นตอนที่ 2"></textarea>
-                <input type="file" accept="image/*">
+                <textarea placeholder="ขั้นตอนที่ 1 ต่อลงมา"></textarea>
             </div>
-            <button onclick="addInstruction()">+ เพิ่มวิธีทำ</button>
         </div>
     </div>
     
     <div id="tags" class="section">
         <div class="container">
-            <h2>เลือกแท็กที่เกี่ยวข้องกับเมนูนี้</h2>
-            <div id="tags-container"></div>
-            <button onclick="addTagOptions()">+ เพิ่มแท็ก</button>
             <h3>เวลาเตรียมส่วนผสม</h3>
             <input type="text" placeholder="เช่น 20 นาที">
             <h3>เวลาปรุงอาหาร</h3>
             <input type="text" placeholder="เช่น 1 ชั่วโมง 15 นาที">
+            <h3>เเคลอรี่</h3>
+            <input type="text" placeholder="เช่น ถจจ แคลอรี่">
+            <h3>ราคา</h3>
+            <input type="text" placeholder="เช่น 100 บาท">
             <button>ยืนยัน</button>
         </div>
     </div>
@@ -175,43 +168,6 @@
     function goToPage(page) {
         window.location.href = page;
     }
-
-    function addIngredient() {
-        const container = document.getElementById('ingredients-container');
-        const ingredientInput = document.createElement('input');
-        ingredientInput.type = 'text';
-        ingredientInput.placeholder = 'เช่น เนื้อหมู';
-        const quantityInput = document.createElement('input');
-        quantityInput.type = 'text';
-        quantityInput.placeholder = 'เช่น 1 กิโลกรัม';
-        container.appendChild(ingredientInput);
-        container.appendChild(quantityInput);
-    }
-
-    function addInstruction() {
-        const container = document.getElementById('instructions-container');
-        const stepTextarea = document.createElement('textarea');
-        stepTextarea.placeholder = 'ขั้นตอนที่ ' + (container.getElementsByTagName('textarea').length + 1);
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        container.appendChild(stepTextarea);
-        container.appendChild(fileInput);
-    }
-
-    function addTagOptions() {
-        const container = document.getElementById('tags-container');
-        const select = document.createElement('select');
-        const options = ['ของคาว', 'ของหวาน', 'เครื่องดื่ม'];
-        options.forEach(optionText => {
-            const option = document.createElement('option');
-            option.value = optionText;
-            option.textContent = optionText;
-            select.appendChild(option);
-        });
-        container.appendChild(select);
-    }
-
     async function searchMenu(event) {
             if(event.key === 'Enter') {
                 try {
@@ -246,8 +202,6 @@
     document.addEventListener("click", function(event) {
             let searchBar = document.getElementById('search-bar');
             let searchResults = document.getElementById('search-results');
-
-            // Check if the clicked element is not the search bar or search results
             if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
                 searchResults.style.display = "none"; // Hide results
                 }
