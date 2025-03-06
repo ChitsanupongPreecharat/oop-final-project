@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wongnai</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+    body {
+        background-color: #f5f5f5;
+        text-align: center;
+    }
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    #img-wn  {
+        cursor: pointer;
+        width: 120px;
+        border-radius: 30px; 
+    }
+    #img-pro {
+        width: 30px;
+        height: 30px;
+        border-radius: 80px;
+        display: flex;
+        margin-top: 13px;
+    }
+    #search-bar {
+        flex-grow: 1;
+        max-width: 400px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+    }
+    .top-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .top-buttons button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        background-color: #ff9900;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+        .section {
+            padding: 40px;
+            border-bottom: 2px solid #ddd;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #ffcc66;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ffb84d;
+        }
+        #search-results {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+            padding: 10px;
+            display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
+            position: absolute;
+            z-index: 10;
+           
+           
+        }   
+        .search-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .search-item:hover {
+            background-color: #f0f0f0;
+        }
+</style>
+<body>
+    <header>
+        <img id="img-wn" onclick ="goToPage('mainpage.html')" src="wongnai001.webp" alt="Wongnai">
+        <div>
+            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
+            <div id="search-results"></div>
+
+        </div>
+        <div class="top-buttons">
+            <img id="img-pro" onclick ="goToPage('Profile')" src="img/images.png" alt="Profile">
+            <button onclick="goToPage('make_recipe.html')">Make your Recipe</button>
+        </div>
+    </header>
+    <div id="top" class="section">
+        <div class="container">
+            <h2>เขียนสูตรอาหาร</h2>
+            <input type="text" placeholder="ชื่อเมนู" id="Menu_name">
+            <textarea id="" placeholder="อธิบายเกี่ยวกับเมนูของคุณ..."></textarea>
+            <input type="text" placeholder="ขนาดสำหรับ">
+        </div>
+    </div>
+    
+    <div id="ingredients" class="section">
+        <div class="container">
+            <h2>ส่วนผสม</h2>
+            <div id="ingredients-container">
+                <input type="text" placeholder="เช่น เนื้อหมู">
+                <input type="text" placeholder="เช่น 1 กิโลกรัม">
+            </div>
+            <button onclick="addIngredient()">+ เพิ่มส่วนผสม</button>
+        </div>
+    </div>
+    
+    <div id="instructions" class="section">
+        <div class="container">
+            <h2>วิธีการทำ</h2>
+            <div id="instructions-container">
+                <textarea placeholder="ขั้นตอนที่ 1"></textarea>
+                <input type="file" accept="image/*">
+                <textarea placeholder="ขั้นตอนที่ 2"></textarea>
+                <input type="file" accept="image/*">
+            </div>
+            <button onclick="addInstruction()">+ เพิ่มวิธีทำ</button>
+        </div>
+    </div>
+    
+    <div id="tags" class="section">
+        <div class="container">
+            <h2>เลือกแท็กที่เกี่ยวข้องกับเมนูนี้</h2>
+            <div id="tags-container"></div>
+            <button onclick="addTagOptions()">+ เพิ่มแท็ก</button>
+            <h3>เวลาเตรียมส่วนผสม</h3>
+            <input type="text" placeholder="เช่น 20 นาที">
+            <h3>เวลาปรุงอาหาร</h3>
+            <input type="text" placeholder="เช่น 1 ชั่วโมง 15 นาที">
+            <button>ยืนยัน</button>
+        </div>
+    </div>
+</body>
+<script>
+    function goToPage(page) {
+        window.location.href = page;
+    }
+
+    function addIngredient() {
+        const container = document.getElementById('ingredients-container');
+        const ingredientInput = document.createElement('input');
+        ingredientInput.type = 'text';
+        ingredientInput.placeholder = 'เช่น เนื้อหมู';
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'text';
+        quantityInput.placeholder = 'เช่น 1 กิโลกรัม';
+        container.appendChild(ingredientInput);
+        container.appendChild(quantityInput);
+    }
+
+    function addInstruction() {
+        const container = document.getElementById('instructions-container');
+        const stepTextarea = document.createElement('textarea');
+        stepTextarea.placeholder = 'ขั้นตอนที่ ' + (container.getElementsByTagName('textarea').length + 1);
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        container.appendChild(stepTextarea);
+        container.appendChild(fileInput);
+    }
+
+    function addTagOptions() {
+        const container = document.getElementById('tags-container');
+        const select = document.createElement('select');
+        const options = ['ของคาว', 'ของหวาน', 'เครื่องดื่ม'];
+        options.forEach(optionText => {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            select.appendChild(option);
+        });
+        container.appendChild(select);
+    }
+
+    async function searchMenu(event) {
+            if(event.key === 'Enter') {
+                try {
+
+                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+
+                if (!menu) {
+                    console.log("Please enter a menu.");
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:8000/searchMenu?menu=${menu}`);
+                const data = await response.json();
+
+                const resultsDiv = document.getElementById('search-results');
+
+                if (data.menu) {
+                    resultsDiv.innerHTML = `<div class="search-item">${data.menu}</div>`;
+                    resultsDiv.style.display = "block"; // Show results
+                    console.log("Menu found:", data.menu);
+                } else {
+                    resultsDiv.innerHTML = `<div class="search-item">menu not found</div>`;
+                    resultsDiv.style.display = "block"; // Show message
+                    console.log("Menu not found",data.menu);
+                }
+                } 
+                catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+        }
+    }
+    document.addEventListener("click", function(event) {
+            let searchBar = document.getElementById('search-bar');
+            let searchResults = document.getElementById('search-results');
+
+            // Check if the clicked element is not the search bar or search results
+            if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
+                searchResults.style.display = "none"; // Hide results
+                }
+            });
+</script>
+</html>

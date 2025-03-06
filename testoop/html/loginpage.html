@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f8f8;
+        }
+        .container {
+            display: flex;
+            width: 800px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .image-section {
+            flex: 1;
+            background: url('https://source.unsplash.com/400x500/?food') no-repeat center center/cover;
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+        }
+        .back-button {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.7);
+            color: black;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .form-section {
+            flex: 1;
+            padding: 40px;
+            text-align: center;
+        }
+        .form-section h1 {
+            margin-bottom: 10px;
+        }
+        .form-section p {
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: orange;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        label input {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-section">
+            <button class="back-button" onclick="goToPage('mainpage.html')">Back to website →</button>
+            <h2>Sharing Flavors, <br> Creating Memories</h2>
+        </div>
+        <div class="form-section">
+            <h1>Log in</h1>
+            <form id="log-in-form">
+                <input type="text" id="username" placeholder="Enter your name" required>
+                <input type="password" id="password" placeholder="Enter your password" required>
+                
+                <button type="submit">Create account</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function goToPage(page) {
+            window.location.href = page;
+        }
+        document.getElementById('log-in-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:8000/log_in', {
+                    method: 'POST',  
+                    headers: {
+                        'Content-Type': 'application/json',  
+                    },
+                    body: JSON.stringify({ username, password })  
+                });
+
+                
+                if (response.ok) {
+                    const data = await response.json();  
+                    if(data.message === "Login successful"){
+                        window.location.href = 'mainpage.html';
+                        alert(data.message);
+
+                    }
+                    else{
+                        alert(data.message)
+                    }
+                   
+                } else {
+                    console.error('log in failed:', response.status);
+                    
+                    alert('log in failed');
+                }
+            } catch (error) {
+                console.error('Error occurred:', error);
+                alert('An error occurred during registration');
+            }
+        });
+    </script>
+</body>
+</html>
