@@ -127,7 +127,7 @@
             <div id="search-results"></div>
         </div>
         <div id="top-buttons">
-            <img id="img-pro" onclick ="goToPage('Profile')" src="img/images.png" alt="Profile">
+            <img id="img-pro" onclick ="goToPage('accpage+cart .html')" src="img/images.png" alt="Profile">
             <button onclick="goToPage('')">Make your Recipe</button>
         </div>
     </header>
@@ -180,10 +180,11 @@
             if(event.key === 'Enter') {
                 try {
 
-                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+                const menu = document.getElementById('search-bar').value.trim();
 
                 if (!menu) {
                     console.log("Please enter a menu.");
+                    
                     return;
                 }
 
