@@ -252,11 +252,10 @@ class Admin(Account):
         return super().get_balance()
 
 class Menu:
-    def __init__(self, menu_id, name, owner, menu_tag, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
+    def __init__(self, menu_id, name, owner,how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
         self.__menu_id = menu_id
         self.__name = name
         self.__owner = owner
-        
         self.__how_to = how_to
         self.__preparing_time = preparing_time
         self.__making_itme = making_itme
@@ -266,6 +265,7 @@ class Menu:
         self.__comments = []
         self.__cost = cost
         self.__checked_by_admin = checked_by_admin
+        
         
 
     def get_menu_id(self):
