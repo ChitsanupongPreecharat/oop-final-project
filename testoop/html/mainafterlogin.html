@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wongnai</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            justify-content: space-between;
+        }
+        body {
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+        header {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            padding: 20px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #img-wn {
+            width: 120px;
+            border-radius: 30px;
+        }
+        #search-bar {
+            flex-grow: 1;
+            max-width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            width: 100%;
+        }
+        #search-bar-container {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            align-items: center;
+        }
+        .top-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .top-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #ff9900;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;   
+        }
+        .search-button{
+            margin: 0px;
+            border: none;
+            background-color: white;
+        }
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .categories button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #ffd700;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .recommend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            padding: 40px;
+        }
+        .item {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            width: 350px;
+            text-align: left;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .item img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .item h2 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .item p {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+        }
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #ff9900;
+            font-weight: bold;
+        }
+        .explore-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: black;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        #search-results {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+            padding: 10px;
+            display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
+            position: absolute;
+            z-index: 10;   
+        }   
+.search-item {
+    padding: 5px;
+    cursor: pointer;
+}
+.search-item:hover {
+    background-color: #f0f0f0;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <img id="img-wn" src="wongnai001.webp" alt="Wongnai">
+        <div id ="search-bar-container">
+            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)" 
+            <div id="search-results"></div>
+        </div>
+        <div class="top-buttons">
+            <img id="img-pro" onclick ="goToPage('accpage+cart .html')" src="img/images.png" alt="Profile">
+            <button onclick="Logout()">Log out</button>
+            <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
+        </div>
+    </header>
+    
+    <nav class="categories">
+        <button onclick="goToPage('dish.html')">Dish</button>
+        <button onclick="goToPage('dessert.html')">Dessert</button>
+        <button onclick="goToPage('beverage.html')">Beverage</button>
+    </nav>
+    
+    <section class="recommend">
+        <div class="item">
+            <img src="recipes_20-tamagoyaki-japanese-omelette.avif" alt="Japanese Omelet">
+            <h2>Recommend</h2>
+            <h3>ไข่หวานต้นหอมญี่ปุ่น</h3>
+            <div class="rating">⭐ 4.9 | ⏳ 20 mins</div>
+            <p>ไข่หวานต้นหอมญี่ปุ่น อัดแน่นไปด้วยแคลเซียมและสารอาหาร...</p>
+            <a href="japanese_omelet.html" class="explore-button">Explore More!</a>
+        </div>
+        
+        <div class="item">
+            <img src="mango-smoothie.jpg" alt="Mango Coconut Smoothie">
+            <h2>Recommend</h2>
+            <h3>Mango Coconut Smoothie</h3>
+            <div class="rating">⭐ 4.9 | ⏳ 20 mins</div>
+            <p>หอมมันชื่นใจสุดๆ กับ Mango Coconut Smoothie ที่ดีต่อสุขภาพ...</p>
+            <a href="mango_smoothie.html" class="explore-button">Explore More!</a>
+        </div>
+    </section>
+    
+    <script>
+        function goToPage(page) {
+            window.location.href = page;
+        }
+        async function searchMenu(event) {
+            if(event.key === 'Enter') {
+                try {
+
+                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+
+                if (!menu) {
+                    console.log("Please enter a menu.");
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:8000/searchMenu?menu=${menu}`);
+                const data = await response.json();
+
+                const resultsDiv = document.getElementById('search-results');
+
+                if (data.menu) {
+                    resultsDiv.innerHTML = `<div class="search-item">${data.menu}</div>`;
+                    resultsDiv.style.display = "block"; // Show results
+                    console.log("Menu found:", data.menu);
+                } else {
+                    resultsDiv.innerHTML = `<div class="search-item">menu not found</div>`;
+                    resultsDiv.style.display = "block"; // Show message
+                    console.log("Menu not found",data.menu);
+                }
+                } 
+                catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+        }
+}
+
+    document.addEventListener("click", function(event) {
+        let searchBar = document.getElementById('search-bar');
+        let searchResults = document.getElementById('search-results');
+
+        // Check if the clicked element is not the search bar or search results
+        if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
+            searchResults.style.display = "none"; // Hide results
+        }
+    });
+
+    async function Logout() {
+    try {
+        
+        const response = await fetch(`http://localhost:8000/log_out`);
+        const data = await response.json();
+        if(data.message){
+            alert(data.message)
+        }
+        else{
+            alert("You already log out")
+        }
+
+        
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+}
+    </script>
+</body>
+</html>
