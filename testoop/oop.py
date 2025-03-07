@@ -32,12 +32,12 @@ class System:
             return {"message": "User added successfully", "username": new_user.get_username()}
         
     
-    def add_menu(self, name, owner,how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
+    def add_menu(self, name, owner, menu_tag, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
         if owner != self.get_current_log_in():
             return {"message": "You are not logged in. Please log in first."}
         else:
             # add menu to system
-            new_menu = Menu(self.__next_menu_id, name, owner,how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin)
+            new_menu = Menu(self.__next_menu_id, name, owner, menu_tag, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin)
             self.__all_menus.append(new_menu)
             #add notification
             new_notification = Notification(self.__notificatoin_id, owner, "New menu added", f"New menu {name} added by {owner}")
@@ -252,7 +252,7 @@ class Admin(Account):
         return super().get_balance()
 
 class Menu:
-    def __init__(self, menu_id, name, owner,how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
+    def __init__(self, menu_id, name, owner, menu_tag, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
         self.__menu_id = menu_id
         self.__name = name
         self.__owner = owner
@@ -384,7 +384,7 @@ payment = Payment("","",0)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"], 
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"], 
     allow_headers=["*"],  
@@ -393,7 +393,7 @@ app.add_middleware(
 class MenuPage(BaseModel):
     name: str
     # owner: str
-    # menu_tag: str
+    menu_tag: str
     how_to: str
     preparing_time: str
     making_itme: str
@@ -431,7 +431,7 @@ def add_menu(menu: MenuPage = Body(...)):
     else:
         owner = system.get_current_log_in()
         return system.add_menu(
-        menu.name, owner,menu.how_to,
+        menu.name, owner, menu.menu_tag, menu.how_to,
         menu.preparing_time, menu.making_itme, menu.size,
         menu.calories, menu.cost, menu.checked_by_admin
     )
