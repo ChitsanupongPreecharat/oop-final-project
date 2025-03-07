@@ -32,12 +32,12 @@ class System:
             return {"message": "User added successfully", "username": new_user.get_username()}
         
     
-    def add_menu(self, name, owner, menu_tag, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
+    def add_menu(self, name, owner, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
         if owner != self.get_current_log_in():
             return {"message": "You are not logged in. Please log in first."}
         else:
             # add menu to system
-            new_menu = Menu(self.__next_menu_id, name, owner, menu_tag, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin)
+            new_menu = Menu(self.__next_menu_id, name, owner, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin)
             self.__all_menus.append(new_menu)
             #add notification
             new_notification = Notification(self.__notificatoin_id, owner, "New menu added", f"New menu {name} added by {owner}")
@@ -368,10 +368,38 @@ class Donation(Payment):
     pass
 
 class Cart:
-    pass
+    def __init__(self):
+        self.__list_of_order = []  # เก็บรายการออเดอร์ทั้งหมด
+
+    def append_order(self, order):
+        self.__list_of_order.append(order)
+        return {"message":"Add order sucessage"}
+        
+
+    def get_list_of_order(self):
+        
+        return [order.get_order_details() for order in self.__list_of_order]
+
 
 class Order:
-    pass
+    def __init__(self, menu_id, price: int, num: int):
+        self.__menu_id = menu_id
+        self.__price = price
+        self.__num = num
+
+    def get_total_price(self):
+        
+        return self.__price * self.__num
+
+    def get_order_details(self):
+        
+        return {
+            "menu_id": self.__menu_id,
+            "price": self.__price,
+            "num": self.__num,
+            "total_price": self.get_total_price()
+        }
+        
 
 system = System()
 nonmember = Nonmember()
@@ -380,6 +408,7 @@ admin.register_admin("admin", "admin")
 notification = Notification(1, 1, "New menu added", "New menu added by admin")
 system.log_in('admin','admin')
 payment = Payment("","",0)
+cart = Cart()
 
 
 app.add_middleware(
@@ -393,7 +422,7 @@ app.add_middleware(
 class MenuPage(BaseModel):
     name: str
     # owner: str
-    menu_tag: str
+    # menu_tag: str
     how_to: str
     preparing_time: str
     making_itme: str
@@ -419,6 +448,11 @@ class Top_up_money(BaseModel):
     # account_id:int
     amount:int    
 
+class AddOrder(BaseModel):
+    menu_id:int
+    price:int
+    num:int    
+
 
 @app.get("/")
 def read_root():
@@ -431,7 +465,7 @@ def add_menu(menu: MenuPage = Body(...)):
     else:
         owner = system.get_current_log_in()
         return system.add_menu(
-        menu.name, owner, menu.menu_tag, menu.how_to,
+        menu.name, owner, menu.how_to,
         menu.preparing_time, menu.making_itme, menu.size,
         menu.calories, menu.cost, menu.checked_by_admin
     )
@@ -551,4 +585,12 @@ def payment_menu(payment_data: PaymentMenu):
 def transaction():
     return system.get_transaction()
 
-# akjdfljaldfj
+@app.post("/addOrder")
+def add_order(AddOrder:AddOrder):
+    order = Order(AddOrder.menu_id,AddOrder.price,AddOrder.num)
+    cart.append_order(order)
+    return {"message":"Add order sucessage"}
+
+@app.get("/get_cart")
+def get_cart():
+    return {"cart": cart.get_list_of_order()}
