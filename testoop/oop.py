@@ -123,6 +123,13 @@ class System:
         for menu in self.__all_menus:
             if menu.get_menu_id() == menu_id:
                 return menu
+            
+    def search_cost_by_menu_id(self,menu_id):
+        for menu in self.__all_menus:
+            if menu.get_menu_id() == menu_id:
+                cost = menu.get_cost()
+                return cost
+
 
     def show_notification(self):
         user = system.get_current_log_in()
@@ -288,6 +295,10 @@ class Menu:
     
     def is_checked_by_admin(self):
         return self.__checked_by_admin
+    
+    def get_cost(self):
+        return self.__cost
+    
 
 class Tag(Menu):
     def __init__(self, tag):
@@ -392,6 +403,7 @@ class Order:
         return self.__price * self.__num
 
     def get_order_details(self):
+
         
         return {
             "menu_id": self.__menu_id,
@@ -450,7 +462,7 @@ class Top_up_money(BaseModel):
 
 class AddOrder(BaseModel):
     menu_id:int
-    price:int
+    # price:int
     num:int    
 
 
@@ -553,11 +565,17 @@ def show_notification():
     
 
 
+
+
 @app.get("/current_log_in")
 def current_log_in():
-    users = [{"username": user.get_username(), "user_id": user.get_user_id(),"user_balance":user.get_balance()} for user in system.get_all_users() if user.get_username() == system.get_current_log_in()]
-    return users
+    # Fetch the current logged-in user
+    current_user = next((user for user in system.get_all_users() if user.get_username() == system.get_current_log_in()), None)
 
+    if current_user:
+        return [{"username": current_user.get_username(), "user_id": current_user.get_user_id(), "user_balance": current_user.get_balance()}]
+    else:
+        return []  
 
    
     
@@ -593,7 +611,9 @@ def transaction():
 
 @app.post("/addOrder")
 def add_order(AddOrder:AddOrder):
-    order = Order(AddOrder.menu_id,AddOrder.price,AddOrder.num)
+    menu= system.search_menu_by_id(AddOrder.menu_id)
+    price = menu.get_cost()
+    order = Order(AddOrder.menu_id,price,AddOrder.num)
     cart.append_order(order)
     return {"message":"Add order sucessage"}
 

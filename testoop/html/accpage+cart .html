@@ -190,8 +190,9 @@
         padding: 10px;
         border-bottom: 1px solid #ddd;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column; /* จัดเรียงจากบนลงล่าง */
+        justify-content: space-between; /* ช่องว่างระหว่างไอเท็ม */
+        height: 300px;
     }
     .cart-container button {
         background-color: #ff9900;
@@ -235,6 +236,11 @@
                 <div id="profile" class="tab-content active">
                     <p id="amount">xxx</p> 
                 </div>
+                <div>
+                    <input type="number" id="amount_top_up" name="amount_top_up" min="1" step="1" placeholder="Enter amount to top up">
+
+                    <button id="top_up" onclick="TopUP()">Replenish</button>
+                </div>
                 <div id="recipes" class="tab-content">
                     <p>xxx</p>
                 </div>
@@ -245,7 +251,7 @@
             <div class="cart-container">
                 <h3>Shopping Cart</h3>
                 <ul>
-                    <li>1</li>
+                    <li id="cart">1</li>
                 </ul>
                 <button onclick="goToPayment()">Payment</button>
             </div>
@@ -262,26 +268,90 @@
     }
 
     async function fetchUserData() {
-        try {
-            let name = document.getElementById('head-name');
-            let amount = document.getElementById('amount');
+    try {
+        let name = document.getElementById('head-name');
+        let amount = document.getElementById('amount');
 
-            const response = await fetch('http://127.0.0.1:8000/current_log_in');  // ✅ เพิ่ม await ใน async function
-            const data = await response.json();
+        const response = await fetch('http://127.0.0.1:8000/current_log_in');  
+        const data = await response.json();
 
-            if (data.ok) {  // ✅ ตรวจสอบว่ามีข้อมูลจริง
-                name.innerHTML = data.username;  
-                amount.innerHTML = `Balance: ${data.user_balance} THB`;  
-            } else {
-                name.innerHTML = "Anonymous";  // ✅ เปลี่ยนเป็น string ป้องกัน Error
-                amount.innerHTML = `Balance: 0 THB`;
-            }
-        } catch (error) {
-            console.error("Error fetching user data:", error);
+        if (data && data.length > 0) {  
+            name.innerHTML = data[0].username;  
+            amount.innerHTML = `Balance: ${data[0].user_balance} THB`;  
+        } else {
+            name.innerHTML = "Anonymous";  
+            amount.innerHTML = `Balance: 0 THB`;
         }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
     }
+} 
+async function GetCart() {
+    try {
+        let cartContainer = document.getElementById('cart');  
 
-    fetchUserData();  // ✅ เรียกใช้ฟังก์ชันเมื่อโหลดหน้าเว็บ
+        const response = await fetch('http://127.0.0.1:8000/get_cart');  
+        const data = await response.json();
+
+        if (data && data.cart && data.cart.length > 0) {  
+            
+            cartContainer.innerHTML = '';  
+
+           
+            data.cart.forEach(item => {
+                let cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+                cartItem.innerHTML = `
+                    <p>Menu ID: ${item.menu_id}</p>
+                    <p>Price: ${item.price} THB</p>
+                    <p>Quantity: ${item.num}</p>
+                    <p>Total Price: ${item.total_price} THB</p>
+                `;
+                cartContainer.appendChild(cartItem);  
+            });
+        } else {
+            cartContainer.innerHTML = "<p>No items in the cart.</p>";  
+        }
+    } catch (error) {
+        console.error("Error fetching cart data:", error);
+    }
+}
+
+async function TopUP() {
+    try {
+        let amount_top_up = document.getElementById('amount_top_up').value; 
+
+        const response = await fetch('http://127.0.0.1:8000/top_up', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                amount: amount_top_up  
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(data.message);
+        } else {
+            
+            const errorData = await response.json();
+            console.error("Error fetching data:", errorData);
+            alert('Failed to top up. Please try again.');
+        }
+    } catch (error) {
+        
+        console.error('Error occurred:', error);
+        alert('An error occurred while adding the menu. Please try again.');
+    }
+}
+
+  
+
+
+fetchUserData();  
+GetCart();
         
         
     </script>
