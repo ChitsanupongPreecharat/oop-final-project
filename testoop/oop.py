@@ -425,7 +425,7 @@ class MenuPage(BaseModel):
     # menu_tag: str
     how_to: str
     preparing_time: str
-    making_itme: str
+    making_time: str
     size: str
     calories: str
     cost: int
@@ -466,7 +466,7 @@ def add_menu(menu: MenuPage = Body(...)):
         owner = system.get_current_log_in()
         return system.add_menu(
         menu.name, owner, menu.how_to,
-        menu.preparing_time, menu.making_itme, menu.size,
+        menu.preparing_time, menu.making_time, menu.size,
         menu.calories, menu.cost, menu.checked_by_admin
     )
     
