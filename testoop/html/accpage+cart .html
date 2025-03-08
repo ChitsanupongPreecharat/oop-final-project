@@ -190,8 +190,9 @@
         padding: 10px;
         border-bottom: 1px solid #ddd;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column; /* จัดเรียงจากบนลงล่าง */
+        justify-content: space-between; /* ช่องว่างระหว่างไอเท็ม */
+        height: 300px;
     }
     .cart-container button {
         background-color: #ff9900;
@@ -234,6 +235,11 @@
                 </div>
                 <div id="profile" class="tab-content active">
                     <p id="amount">xxx</p> 
+                </div>
+                <div>
+                    <input type="number" id="amount_top_up" name="amount_top_up" min="1" step="1" placeholder="Enter amount to top up">
+
+                    <button id="top_up" onclick="TopUP()">Replenish</button>
                 </div>
                 <div id="recipes" class="tab-content">
                     <p>xxx</p>
@@ -308,6 +314,36 @@ async function GetCart() {
         }
     } catch (error) {
         console.error("Error fetching cart data:", error);
+    }
+}
+
+async function TopUP() {
+    try {
+        let amount_top_up = document.getElementById('amount_top_up').value; 
+
+        const response = await fetch('http://127.0.0.1:8000/top_up', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                amount: amount_top_up  
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(data.message);
+        } else {
+            
+            const errorData = await response.json();
+            console.error("Error fetching data:", errorData);
+            alert('Failed to top up. Please try again.');
+        }
+    } catch (error) {
+        
+        console.error('Error occurred:', error);
+        alert('An error occurred while adding the menu. Please try again.');
     }
 }
 
