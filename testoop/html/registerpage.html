@@ -130,9 +130,9 @@
                     alert(data.message);
                     window.location.href = 'mainpage.html';
                 } else {
-                    const errorData = await response.json();  // Read FastAPI error message
+                    const errorData = await response.json();
                     console.error('Registration failed:', errorData);
-                    alert('Registration failed: ' + errorData.detail);  // Show error message
+                    alert('Registration failed: ' + errorData.detail);
                 }
             } catch (error) {
                 console.error('Error occurred:', error);

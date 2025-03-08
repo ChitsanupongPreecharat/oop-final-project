@@ -118,6 +118,11 @@
         .search-item:hover {
             background-color: #f0f0f0;
         }
+        .admin-icon {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
 </style>
 <body>
     <header>
@@ -127,6 +132,7 @@
             <div id="search-results"></div>
         </div>
         <div id="top-buttons">
+            <img src="admin-icon.png" class="admin-icon" onclick="goToPage('admindecision.html')" alt="Admin">
             <img id="img-pro" onclick ="goToPage('accpage+cart .html')" src="img/images.png" alt="Profile">
             <button onclick="goToPage('')">Make your Recipe</button>
         </div>

@@ -75,8 +75,7 @@
             background-color: #ffd700;
             color: black;
             font-weight: bold;
-            cursor: pointer;
-            
+            cursor: pointer;   
         }
         .explore-button {
             display: inline-block;
@@ -108,86 +107,35 @@
         .search-item:hover {
             background-color: #f0f0f0;
         }
+        .admin-icon {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
         .container {
-            max-width: 600px;
-            margin: auto;
-            background: #fff8e1;
+            width: 70%;
+            margin: 20px auto;
+            border: 2px solid #000;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            background-color: white; 
         }
-        .flex {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            
-        }
-        .container-box {
-            display: flex;
-            gap: 0px;
-        }
-        .card {
-            background-color: #ffedcc;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 180px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .icon {
-            font-size: 30px;
+        .menu-box {
+            border: 2px solid #000;
+            padding: 15px;
             margin-bottom: 10px;
         }
-        .bold {
-            font-weight: bold;
+        .action-box {
+            margin-top: 20px;
         }
-        .lower-buttons {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px; /* Add gap between buttons */
+        input {
+            padding: 5px;
+            margin-right: 10px;
         }
-        .lower-button-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .button {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: #ffedcc;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
+        button {
+            padding: 5px 10px;
+            margin: 5px;
+            border: 1px solid #000;
             cursor: pointer;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .button.like-active {
-            background-color: #ffcc66; /* Darker color for active like button */
-        }
-        .icon {
-            font-size: 20px;
-        }
-        .like-count {
-            margin-left: 10px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .dicision-btn-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: #ffedcc;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -199,100 +147,40 @@
             <div id="search-results"></div>
         </div>
         <div class="top-buttons">
+            <img src="admin-icon.png" class="admin-icon" onclick="goToPage('admindecision.html')" alt="Admin">
             <button onclick="goToPage('registerpage.html')">Register</button>
             <button onclick="Logout()">Log out</button>
             <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
         </div>
     </header>
-    
-    <nav class="categories">
-        <button onclick="goToPage('dish.html')">Dish</button>
-        <button onclick="goToPage('dessert.html')">Dessert</button>
-        <button onclick="goToPage('beverage.html')">Beverage</button>
-    </nav>
 
-    <div class="section">
-        <div class="container">
-            <h2>วิธีทำ"xxxx"</h2>
+    <div class="container">
+        <h2>Admin Approve Menu</h2>
+        <div class="menu-box">
+            <p><strong>Menu ID:</strong> 1</p>
+            <p><strong>Name:</strong> เมนูที่ 1</p>
         </div>
-    </div>
-    <div class="flex">
-        <div class="container-box">
-            <div class="card">
-                <div class="icon">🍚</div>
-                <div class="bold">ระยะเวลาในการเตรียมของ:</div>
-                <div>xx นาที</div>
-            </div>
-            <div class="card">
-                <div class="icon">🍲</div>
-                <div class="bold">ระยะเวลาในการทำ:</div>
-                <div>xx นาที</div>
-            </div>
-            <div class="card">
-                <div class="icon">🔥</div>
-                <div class="bold">แคลอรี่:</div>
-                <div>xx กิโลแคลอรี่ / เสิร์ฟ</div>
-            </div>
-            <div class="card">
-                <div class="icon">🍴</div>
-                <div class="bold">ขนาด:</div>
-                <div>xx เสิร์ฟ</div>
-            </div>
+        <div class="menu-box">
+            <p><strong>Menu ID:</strong> x</p>
+            <p><strong>Name:</strong> เมนูที่ x</p>
         </div>
-    </div>
-    <div class="section">
-        <div class="container">
-            <h2>วัตถุดิบ</h2>
-            <p>
-                1. <br>
-                2. <br>
-                3. <br>
-                4. <br>
-                5. <br>
-                6. <br>
-            </p>
+        <div class="menu-box">
+            <p><strong>Menu ID:</strong> x</p>
+            <p><strong>Name:</strong> เมนูที่ x</p>
         </div>
-    </div>
-    <div class="section">
-        <div class="container">
-            <h2>วิธีทำ</h2>
-            <p>
-                1. <br>
-                2. <br>
-                3. <br>
-                4. <br>
-                5. <br>
-                6. <br>
-            </p>
+        <div class="menu-box">
+            <p><strong>Menu ID:</strong> x</p>
+            <p><strong>Name:</strong> เมนูที่ x</p>
         </div>
-    </div>
-    <div class="section">
-        <div class="container">
-            <h2>คำอธิบาย</h2>
-            <p>xx</p>
+        <div class="menu-box">
+            <p><strong>Menu ID:</strong> x</p>
+            <p><strong>Name:</strong> เมนูที่ x</p>
         </div>
-    </div>
-    <div class="lower-buttons">
-        <div class="lower-button-container">
-            <button class="button" onclick="toggleLike(this)">
-                <span class="icon">💬</span>
-                <span>Comment</span>
-            </button>
-            <button class="button" onclick="toggleLike(this)">
-                <span class="icon">👍</span>
-                <span>Like</span>
-                <span class="like-count">0</span>
-            </button>
-            <button class="button" onclick="toggleLike(this)">
-                <span class="icon">🛒</span>
-                <span>Add to Cart</span>
-            </button>
-        
+        <div class="action-box">
+            <input type="text" placeholder="ใส่ Menu ID">
+            <button class="approve-btn">Approve</button>
+            <button class="reject-btn">Reject</button>
         </div>
-    </div>
-    <div class = "decision-btn-container">
-        <button id = "button>">Approve</button>
-        <button id = "button>">Reject</button>
     </div>
     <script>
         function goToPage(page) {

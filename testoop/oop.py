@@ -36,10 +36,8 @@ class System:
         if owner != self.get_current_log_in():
             return {"message": "You are not logged in. Please log in first."}
         else:
-            # add menu to system
             new_menu = Menu(self.__next_menu_id, name, owner, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin)
             self.__all_menus.append(new_menu)
-            #add notification
             new_notification = Notification(self.__notificatoin_id, owner, "New menu added", f"New menu {name} added by {owner}")
             self.add_notification(new_notification)
             self.__next_menu_id += 1  
