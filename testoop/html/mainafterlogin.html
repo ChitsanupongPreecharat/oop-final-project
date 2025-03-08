@@ -130,7 +130,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
+            margin-top: 100px;
             padding: 10px;
             display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
             position: absolute;
@@ -149,21 +149,17 @@
     <header>
         <img id="img-wn" src="wongnai001.webp" alt="Wongnai">
         <div id ="search-bar-container">
-            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)" 
+            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)" >
             <div id="search-results"></div>
         </div>
         <div class="top-buttons">
-            <img id="img-pro" onclick ="goToPage('accpage+cart .html')" src="img/images.png" alt="Profile">
-            <button onclick="Logout()">Log out</button>
+            <img id="img-pro" onclick ="goToPage('accpage+cart .html')" src="images.png" width="30" alt="Profile">
+            <button  onclick="Logout()">Log out</button>
             <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
         </div>
     </header>
     
-    <nav class="categories">
-        <button onclick="goToPage('dish.html')">Dish</button>
-        <button onclick="goToPage('dessert.html')">Dessert</button>
-        <button onclick="goToPage('beverage.html')">Beverage</button>
-    </nav>
+    
     
     <section class="recommend">
         <div class="item">
@@ -238,6 +234,7 @@
         const data = await response.json();
         if(data.message){
             alert(data.message)
+            window.location.href = 'mainpage.html';
         }
         else{
             alert("You already log out")
