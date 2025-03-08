@@ -105,7 +105,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
+            margin-top: 100px;
             padding: 10px;
             display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
             position: absolute;
@@ -154,9 +154,37 @@
         border-bottom: 2px solid #ffcc00;
         font-weight: bold;
     }    
-    .admin-icon {
-        width: 30px;
-        height: 30px;
+    .tab-content {
+        display: none;
+        background: white;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    .cart-container h3 {
+        margin-bottom: 20px;
+    }
+    .cart-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .cart-container li {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        flex-direction: column; /* จัดเรียงจากบนลงล่าง */
+        justify-content: space-between; /* ช่องว่างระหว่างไอเท็ม */
+        height: 300px;
+    }
+    .cart-container button {
+        background-color: #ff9900;
+        border: none;
+        color: white;
+        padding: 10px 20px;
         cursor: pointer;
     }
 </style>
@@ -164,34 +192,193 @@
 <body>
     <Navbar>
         <header>
-            <img id="img-wn" onclick ="goToPage('mainpage.html')" src="wongnai001.webp" alt="Wongnai">
+            <img id="img-wn" onclick ="goToPage('mainafterlogin.html')" src="wongnai001.webp" alt="Wongnai">
             <div id ="search-bar-container">
                 <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
                 <div id="search-results"></div>
             </div>
             <div id="top-buttons">
-                <img src="admin-icon.png" class="admin-icon" onclick="goToPage('admindecision.html')" alt="Admin">
-                <img id="img-pro" onclick ="goToPage('Profile')" src="img/images.png" alt="Profile">
-                <button onclick="goToPage('')">Make your Recipe</button>
+                
+                <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
             </div>
         </header>
     </Navbar>
     <proacc-container>
-        <div class="profile-container">
-            <div class="profile-pic"></div>
-            <h2>Somchai Chira</h2>
-            <p>somchai.chira@gmail.com</p>
-            <div class="tabs">
-                <span class="active">Profile</span>
-                <span>Your Recipes (0)</span>
-                <span>Favorites (0)</span>
+        <div class="container-wrapper">
+            <div class="profile-container">
+                <div class="profile-pic"></div>
+                <h2 id="head-name">xxx</h2>
+                <p id="user_id">xxx@gmail.com</p>
+                <div class="tabs">
+                    <span class="active" data-tab="profile">Profile</span>
+                    <span data-tab="recipes">Your Recipes (0)</span>
+                    <span data-tab="favorites">Favorites (0)</span>
+                </div>
+                <div id="profile" class="tab-content active">
+                    <p id="amount">xxx</p> 
+                </div>
+                <div>
+                    <input type="number" id="amount_top_up" name="amount_top_up" min="1" step="1" placeholder="Enter amount to top up">
+
+                    <button id="top_up" onclick="TopUP()">Replenish</button>
+                </div>
+                <div id="recipes" class="tab-content">
+                    <p>xxx</p>
+                </div>
+                <div id="favorites" class="tab-content">
+                    <p>xxx</p>
+                </div>
+            </div>
+            <div class="cart-container">
+                <h3>Shopping Cart</h3>
+                <ul>
+                    <li id="cart">1</li>
+                </ul>
+                <button onclick="goToPayment()">Payment</button>
             </div>
         </div>
     </proacc-container>
     <script>
-        function goToPage(page) {
-            window.location.href = page;
+        
+
+        function goToPayment() {
+            alert('Proceeding to payment');
         }
+        function goToPage(page) {
+        window.location.href = page;
+    }
+
+    async function fetchUserData() {
+    try {
+        let name = document.getElementById('head-name');
+        let amount = document.getElementById('amount');
+        let id = document.getElementById('user_id');
+
+        const response = await fetch('http://127.0.0.1:8000/current_log_in');  
+        const data = await response.json();
+
+        if (data && data.length > 0) {  
+            name.innerHTML = data[0].username;  
+            amount.innerHTML = `Balance: ${data[0].user_balance} THB`;  
+            id.innerHTML = `User id: ${data[0].user_id} `;
+        } else {
+            name.innerHTML = "Anonymous";  
+            amount.innerHTML = `Balance: 0 THB`;
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+} 
+async function GetCart() {
+    try {
+        let cartContainer = document.getElementById('cart');  
+
+        const response = await fetch('http://127.0.0.1:8000/get_cart');  
+        const data = await response.json();
+
+        if (data && data.cart && data.cart.length > 0) {  
+            
+            cartContainer.innerHTML = '';  
+
+           
+            data.cart.forEach(item => {
+                let cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+                cartItem.innerHTML = `
+                    <p>Menu ID: ${item.menu_id}</p>
+                    <p>Price: ${item.price} THB</p>
+                    <p>Quantity: ${item.num}</p>
+                    <p>Total Price: ${item.total_price} THB</p>
+                `;
+                cartContainer.appendChild(cartItem);  
+            });
+        } else {
+            cartContainer.innerHTML = "<p>No items in the cart.</p>";  
+        }
+    } catch (error) {
+        console.error("Error fetching cart data:", error);
+    }
+}
+
+async function TopUP() {
+    try {
+        let amount_top_up = document.getElementById('amount_top_up').value; 
+
+        const response = await fetch('http://127.0.0.1:8000/top_up', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                amount: amount_top_up  
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // alert(data.message);
+            window.location.href = 'accpage+cart .html';
+        } else {
+            
+            const errorData = await response.json();
+            console.error("Error fetching data:", errorData);
+            alert('Failed to top up. Please try again.');
+        }
+    } catch (error) {
+        
+        console.error('Error occurred:', error);
+        alert('An error occurred while adding the menu. Please try again.');
+    }
+}
+async function searchMenu(event) {
+            if(event.key === 'Enter') {
+                try {
+
+                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+
+                if (!menu) {
+                    console.log("Please enter a menu.");
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:8000/searchMenu?menu=${menu}`);
+                const data = await response.json();
+
+                const resultsDiv = document.getElementById('search-results');
+
+                if (data.menu) {
+                    resultsDiv.innerHTML = `<div class="search-item">${data.menu}</div>`;
+                    resultsDiv.style.display = "block"; // Show results
+                    console.log("Menu found:", data.menu);
+                } else {
+                    resultsDiv.innerHTML = `<div class="search-item">menu not found</div>`;
+                    resultsDiv.style.display = "block"; // Show message
+                    console.log("Menu not found",data.menu);
+                }
+                } 
+                catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+        }
+}
+
+document.addEventListener("click", function(event) {
+        let searchBar = document.getElementById('search-bar');
+        let searchResults = document.getElementById('search-results');
+
+        // Check if the clicked element is not the search bar or search results
+        if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
+            searchResults.style.display = "none"; // Hide results
+        }
+    });
+
+  
+
+
+fetchUserData();  
+GetCart();
+        
+        
     </script>
 </body>
 </html>
