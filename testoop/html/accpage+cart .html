@@ -245,7 +245,7 @@
             <div class="cart-container">
                 <h3>Shopping Cart</h3>
                 <ul>
-                    <li>1</li>
+                    <li id="cart">1</li>
                 </ul>
                 <button onclick="goToPayment()">Payment</button>
             </div>
@@ -279,9 +279,43 @@
     } catch (error) {
         console.error("Error fetching user data:", error);
     }
+} 
+async function GetCart() {
+    try {
+        let cartContainer = document.getElementById('cart');  
+
+        const response = await fetch('http://127.0.0.1:8000/get_cart');  
+        const data = await response.json();
+
+        if (data && data.cart && data.cart.length > 0) {  
+            
+            cartContainer.innerHTML = '';  
+
+           
+            data.cart.forEach(item => {
+                let cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+                cartItem.innerHTML = `
+                    <p>Menu ID: ${item.menu_id}</p>
+                    <p>Price: ${item.price} THB</p>
+                    <p>Quantity: ${item.num}</p>
+                    <p>Total Price: ${item.total_price} THB</p>
+                `;
+                cartContainer.appendChild(cartItem);  
+            });
+        } else {
+            cartContainer.innerHTML = "<p>No items in the cart.</p>";  
+        }
+    } catch (error) {
+        console.error("Error fetching cart data:", error);
+    }
 }
 
+  
+
+
 fetchUserData();  
+GetCart();
         
         
     </script>
