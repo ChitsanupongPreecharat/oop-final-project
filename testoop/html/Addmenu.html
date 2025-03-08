@@ -105,7 +105,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
+            margin-top: 100px;
             padding: 10px;
             display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
             position: absolute;
@@ -121,14 +121,14 @@
 </style>
 <body>
     <header>
-        <img id="img-wn" onclick ="goToPage('mainpage.html')" src="wongnai001.webp" alt="Wongnai">
+        <img id="img-wn" onclick ="goToPage('mainafterlogin.html')" src="wongnai001.webp" alt="Wongnai">
         <div id ="search-bar-container">
             <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
             <div id="search-results"></div>
         </div>
         <div id="top-buttons">
-            <img id="img-pro" onclick ="goToPage('accpage+cart .html')" src="img/images.png" alt="Profile">
-            <button onclick="goToPage('')">Make your Recipe</button>
+            <img id="img-pro" onclick ="goToPage('accpage+cart .html')" src="images.png" alt="Profile">
+            <!-- <button onclick="goToPage('')">Make your Recipe</button> -->
         </div>
     </header>
     <div id="top" class="section">
@@ -249,7 +249,7 @@
                                     const data = await response.json();
                                     alert(data.message);
                                     if (data.message === "Menu added successfully") {
-                                        window.location.href = 'mainpage.html';
+                                        window.location.href = 'mainafterlogin.html';
                                     }
                                 } else {
                                     const errorText = await response.text();

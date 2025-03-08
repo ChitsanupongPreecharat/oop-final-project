@@ -149,21 +149,16 @@
     <header>
         <img id="img-wn" src="wongnai001.webp" alt="Wongnai">
         <div id ="search-bar-container">
-            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)" 
-            <div id="search-results"></div>
+            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)" >
         </div>
         <div class="top-buttons">
             <button onclick="goToPage('registerpage.html')">Register</button>
-            <button onclick="Logout()">Log out</button>
-            <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
+            
+            
         </div>
     </header>
     
-    <nav class="categories">
-        <button onclick="goToPage('dish.html')">Dish</button>
-        <button onclick="goToPage('dessert.html')">Dessert</button>
-        <button onclick="goToPage('beverage.html')">Beverage</button>
-    </nav>
+  
     
     <section class="recommend">
         <div class="item">
@@ -231,23 +226,7 @@
         }
     });
 
-    async function Logout() {
-    try {
-        
-        const response = await fetch(`http://localhost:8000/log_out`);
-        const data = await response.json();
-        if(data.message){
-            alert(data.message)
-        }
-        else{
-            alert("You already log out")
-        }
-
-        
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-    }
-}
+    
     </script>
 </body>
 </html>
