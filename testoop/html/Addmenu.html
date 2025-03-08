@@ -135,8 +135,8 @@
         <div class="container">
             <h2>เขียนสูตรอาหาร</h2>
             <input type="text" placeholder="ชื่อเมนู" id="Menu_name">
-            <textarea id="" placeholder="อธิบายเกี่ยวกับเมนูของคุณ..."></textarea>
-            <input type="text" placeholder="ขนาดสำหรับ">
+            <!-- <textarea id="" placeholder="อธิบายเกี่ยวกับเมนูของคุณ..."></textarea> -->
+            <input id="size" type="text" placeholder="ขนาดสำหรับ">
         </div>
     </div>
     
@@ -144,7 +144,7 @@
         <div class="container">
             <h2>ส่วนผสม</h2>
             <div id="ingredients-container">
-                <input type="text" placeholder="เช่น เนื้อหมู 1 กิโลกรัม ต่อลงมา">
+                <input id="ingredients-input" type="text" placeholder="เช่น เนื้อหมู 1 กิโลกรัม ต่อลงมา">
             </div>
         </div>
     </div>
@@ -153,7 +153,7 @@
         <div class="container">
             <h2>วิธีการทำ</h2>
             <div id="instructions-container">
-                <textarea placeholder="ขั้นตอนที่ 1 ต่อลงมา"></textarea>
+                <textarea id="instructions-input" placeholder="ขั้นตอนที่ 1 ต่อลงมา"></textarea>
             </div>
         </div>
     </div>
@@ -161,14 +161,14 @@
     <div id="tags" class="section">
         <div class="container">
             <h3>เวลาเตรียมส่วนผสม</h3>
-            <input type="text" placeholder="เช่น 20 นาที">
+            <input id="preparing_time" type="text" placeholder="เช่น 20 นาที">
             <h3>เวลาปรุงอาหาร</h3>
-            <input type="text" placeholder="เช่น 1 ชั่วโมง 15 นาที">
+            <input id="making_time" type="text" placeholder="เช่น 1 ชั่วโมง 15 นาที">
             <h3>เเคลอรี่</h3>
-            <input type="text" placeholder="เช่น ถจจ แคลอรี่">
+            <input id="calories" type="text" placeholder="เช่น 500 แคลอรี่">
             <h3>ราคา</h3>
-            <input type="text" placeholder="เช่น 100 บาท">
-            <button>ยืนยัน</button>
+            <input id="cost" type="text" placeholder="เช่น 100 บาท">
+            <button onclick="add_menu()">ยืนยัน</button>
         </div>
     </div>
 </body>
@@ -208,12 +208,59 @@
                 }
         }
     }
-    document.addEventListener("click", function(event) {
-            let searchBar = document.getElementById('search-bar');
-            let searchResults = document.getElementById('search-results');
-            if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
-                searchResults.style.display = "none"; // Hide results
-                }
-            });
+                document.addEventListener("click", function(event) {
+                        let searchBar = document.getElementById('search-bar');
+                        let searchResults = document.getElementById('search-results');
+                        if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
+                            searchResults.style.display = "none"; // Hide results
+                            }
+                        });
+        
+        
+                        async function add_menu() {
+                            const name = document.getElementById('Menu_name').value.trim();
+                            const size = document.getElementById('size').value.trim();
+                            const ingredients = document.getElementById('ingredients-input').value.trim(); // Fixed
+                            const how_to = document.getElementById('instructions-input').value.trim(); // Fixed
+                            const preparing_time = document.getElementById('preparing_time').value.trim();
+                            const making_time = document.getElementById('making_time').value.trim();
+                            const calories = document.getElementById('calories').value.trim();
+                            const cost = document.getElementById('cost').value.trim();
+
+                            try {
+                                const response = await fetch('http://127.0.0.1:8000/add_menu', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ 
+                                        name, 
+                                        how_to, 
+                                        preparing_time, 
+                                        making_time, 
+                                        size, 
+                                        calories, 
+                                        cost 
+                                        
+                                    }),
+                                });
+
+                                if (response.ok) {
+                                    const data = await response.json();
+                                    alert(data.message);
+                                    if (data.message === "Menu added successfully") {
+                                        window.location.href = 'mainpage.html';
+                                    }
+                                } else {
+                                    const errorText = await response.text();
+                                    console.error('Add menu failed:', response.status, errorText);
+                                    alert(`Add menu failed: ${response.statusText}`);
+                                }
+                            } catch (error) {
+                                console.error('Error occurred:', error);
+                                alert('An error occurred while adding the menu. Please try again.');
+                            }
+                        }
+
 </script>
 </html>
