@@ -341,7 +341,7 @@ class Transaction:
         self.__status = status
 
 class Payment:
-    def __init__(self,account_from,account_to,amount):
+    def __init__(self,account_from,account_to,amount:int):
         self.__account_from = account_from
         self.__account_to = account_to
         self.__amount = amount
@@ -350,47 +350,44 @@ class Payment:
         return self.__account_form    
 
     def transfer(self, account_from, account_to, amount: int):
-        # Initialize sender and receiver as None
-        sender = None
-        receiver = None
+        # ตรวจสอบว่า amount เป็นจำนวนที่ถูกต้อง
+        if not isinstance(amount, (int, float)):  # ตรวจสอบว่า amount เป็นตัวเลข
+            return {"message": "Invalid transfer amount: Amount must be a number"}
+        
+        # if amount <= 0:  # ตรวจสอบว่า amount น้อยกว่าหรือเท่ากับ 0
+        #     return {"message": "Invalid transfer amount: Amount must be greater than 0"}
+        
+        # ส่วนของการทำธุรกรรม
+        sender = account_from
+        receiver = account_to
 
-        # Check if both account_from and account_to are different
-        if account_from == account_to:
+        if sender == receiver:
             return {"message": "Sender and receiver cannot be the same"}
 
-        # Create a dictionary for fast lookup
-        user_dict = {user.get_username(): user for user in system.get_all_users()}
-
-        # Find sender and receiver
-        sender = user_dict.get(account_from)
-        receiver = user_dict.get(account_to)
-
-        # If sender or receiver is not found
         if not sender:
             return {"message": "Sender not found"}
         if not receiver:
             return {"message": "Receiver not found"}
 
-        # Check if the amount is valid
-        if amount <= 0:
-            return {"message": "Invalid transfer amount"}
+        # ตรวจสอบยอดเงินของผู้โอน
+        if sender.get_balance() < amount:
+            return {"message": "Insufficient balance"}
 
-        # Check if sender has sufficient balance
-        if sender.get_balance() >= amount:
-            sender.decrease_balance(amount)  # Deduct amount from sender
-            receiver.increase_balance(amount)  # Add amount to receiver
-            
-            # Add the transaction to the system
-            transaction_id = system.generate_transaction_id()
-            system.add_transaction(Transaction(transaction_id, sender.get_username(), receiver.get_username(), amount, "payment"))
-            
-            # Add a notification for sender
-            notification_id = system.generate_notification_id()
-            system.add_notification(Notification(notification_id, sender.get_username(), "payment successful", f"User {sender.get_username()} payment successful"))
+        # ดำเนินการโอน
+        sender.decrease_balance(amount)
+        receiver.increase_balance(amount)
 
-            return {"message": "Transfer successful", "transaction_id": transaction_id, "amount": amount}
+        # สร้าง transaction ID และบันทึกธุรกรรม
+        transaction_id = system.generate_transaction_id()
+        transaction = Transaction(transaction_id, sender.get_username(), receiver.get_username(), amount, "payment")
+        system.add_transaction(transaction)
 
-        return {"message": "Insufficient balance"}
+        # การแจ้งเตือน
+        notification_id = system.generate_notification_id()
+        system.add_notification(Notification(notification_id, sender.get_username(), "Payment successful", f"Payment of {amount} to {receiver.get_username()} was successful"))
+
+        return {"message": "Transfer successful", "transaction_id": transaction_id, "amount": amount}
+
 
 
 class Donation(Payment):
@@ -423,8 +420,8 @@ class Order:
         self.__num = num
 
     def get_total_price(self):
-        
         return self.__price * self.__num
+        
 
     def get_order_details(self):
 
@@ -449,6 +446,7 @@ notification = Notification(1, 1, "New menu added", "New menu added by admin")
 system.log_in('admin','admin')
 payment = Payment("","",0)
 cart = Cart()
+order = Order(0,0,0)
 
 
 app.add_middleware(
@@ -561,12 +559,23 @@ def search_menu(menu:str = Query(...,description="menu to search")):
         
     return {"message":f"menu {menu} not found"}
 
+@app.get("/showMenu")
+def search_menu(menu:str = Query(...,description="menu to search")):
+    for m in system.get_all_menus():
+        if m.get_name() == menu and m._Menu__checked_by_admin == True:
+            return {"menu":m}
+        
+    return {"message":f"menu {menu} not found"}
+
 @app.get("/serach_not_approved_menu")
 def get_waiting_for_approval_menu():
     return [menu.__dict__ for menu in system.get_waiting_for_approval_menu()]
 
 @app.post("/approve_menu/{menu_id}")
 def approve_menu(menu_id: int):
+    user = system.get_current_log_in()
+    if user != 'admin':
+        return {"message": "You can not approved or reject anything"}
     menu = system.search_menu_by_id(menu_id)
     if menu is None:
         return {"message": "Menu id not found"}
@@ -630,30 +639,50 @@ def payment_menu():
     
     account_from = system.get_current_log_in()
 
-    
-    menu_id = [cart.get_menu_id()] 
-    total_price = [cart.get_total_price()]  
+    # ตรวจสอบข้อมูลของ cart
+    menu_id = [cart.get_menu_id()]  # ควรจะเป็นลิสต์ของ menu_id
+    total_price = [order.get_total_price()]  # ควรจะเป็นลิสต์ของ total_price
 
-    
+    if total_price is None:
+        return {"message": "total_price is None"}
     if isinstance(account_from, list):
         return {"message": "Invalid account data"}
 
     payments = []
 
-    
-    for i in range(len(menu_id)):
-        account_to = system.search_user_by_menu_id(menu_id[i])
+    # ควรเริ่มจาก 0 แทนที่จะเป็น 1 เพราะเราอาจจะมีเพียงแค่ 1 รายการใน menu_id และ total_price
+    for i in range(len(menu_id)):  # ใช้ len(menu_id) เพื่อหลีกเลี่ยงการเกิด IndexError
+        account_to = system.search_user_by_menu_id(menu_id[i])  # ค้นหาผู้รับ
         if isinstance(account_to, list):
-            account_to = account_to[0]  
-        
-       
-        payment = Payment(account_from, account_to, total_price[i])
-        transfer_result = payment.transfer(account_from, account_to, total_price[i])
-        
-      
+            account_to = account_to[0]  # เลือกบัญชีผู้รับแรก
+            if account_to is None:
+                return {"message": "account_to None"}
+
+        # ตรวจสอบว่า total_price[i] เป็นลิสต์หรือไม่
+        if isinstance(total_price[i], list):
+            if len(total_price[i]) > 0:
+                try:
+                    amount = int(total_price[i])  # แปลงจำนวนเงินจากลิสต์
+                except ValueError:
+                    return {"message": f"Invalid amount value: {total_price[i]} is not a valid number"}
+            else:
+                return {"message": f"Invalid amount: List is empty at index {i}"}
+        else:
+            # ถ้าไม่ใช่ลิสต์ ก็ให้พยายามแปลงเป็นจำนวนเต็ม
+            try:
+                amount = int(total_price[i])
+            except ValueError:
+                return {"message": f"Invalid amount value: {total_price[i]} is not a valid number"}
+
+        # สร้างการทำธุรกรรมและโอนเงิน
+        payment = Payment(account_from, account_to, amount)
+        transfer_result = payment.transfer(account_from, account_to, amount)
         payments.append(transfer_result)
 
     return {"payments": payments}
+
+      
+
        
         
         
