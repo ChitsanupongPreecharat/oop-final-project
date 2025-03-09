@@ -121,7 +121,7 @@
         .profile-container {
     background: white;
     width: 50%;
-    margin: 50px auto;
+   
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -187,6 +187,51 @@
         padding: 10px 20px;
         cursor: pointer;
     }
+   /* จัด Layout ให้ Profile และ Shopping Cart */
+.container-wrapper {
+    display: flex;
+    justify-content: center; /* จัดให้อยู่ตรงกลาง */
+    align-items: flex-start;
+    gap: 30px; /* ระยะห่างระหว่าง Profile และ Shopping Cart */
+    padding: 20px;
+}
+
+/* Profile Box */
+.profile-container {
+    width: 40%;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Shopping Cart Box */
+.cart-container {
+    width: 40%;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ปรับแต่งปุ่มให้ดูดีขึ้น */
+button {
+    width: 100%;
+    background-color: #FFA500;
+    color: white;
+    font-size: 18px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #FF8C00;
+}
+
+
 </style>
 </html>
 <body>
