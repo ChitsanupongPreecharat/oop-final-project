@@ -343,35 +343,41 @@ class Payment:
     def get_account_form(self):
         return self.__account_form    
 
-    def transfer(self, sender,receiver, amount: int):
+    def transfer(self, account_from, account_to, amount: int):
+        # Initialize sender and receiver as None
         sender = None
         receiver = None
 
-        
+        # Find sender and receiver from the list of all users
         for user in system.get_all_users():
-            if user.get_username() == self.__account_from:
-                sender = user
+            if user.get_username() == account_from:
+                sender = user  # Assign user object to sender
                 break  
 
-        
         for user in system.get_all_users():
-            if user.get_username() == self.__account_to:
-                receiver = user
+            if user.get_username() == account_to:
+                receiver = user  # Assign user object to receiver
                 break 
 
-        
+        # If sender or receiver is not found, return an error message
         if sender is None or receiver is None:
             return {"message": "Sender or receiver not found"}
 
+        # Check if sender has sufficient balance
         if sender.get_balance() >= amount:
-            sender.decrease_balance(amount)  
-            receiver.increase_balance(amount)
-            system.add_transaction(Transaction(system._System__transaction_id,sender.get_username(),receiver.get_username(),amount,"payment"))  
+            sender.decrease_balance(amount)  # Deduct amount from sender
+            receiver.increase_balance(amount)  # Add amount to receiver
+            
+            # Add the transaction to the system
+            system.add_transaction(Transaction(system._System__transaction_id, sender.get_username(), receiver.get_username(), amount, "payment"))
+            
+            # Add a notification for sender
             system.add_notification(Notification(system._System__notification_id, sender.get_username(), "payment successful", f"User {sender.get_username()} payment successful"))
 
             return {"message": "Transfer successful"}
 
         return {"message": "Insufficient balance"}
+
 
 class Donation(Payment):
     pass
@@ -390,9 +396,10 @@ class Cart:
         return [order.get_order_details() for order in self.__list_of_order]
     
     def get_menu_id(self):
-        return [order.get_menu_id() for order in self.__list_of_order()]
+        return [order.get_menu_id() for order in self.__list_of_order]
+    
     def get_total_price(self):
-        return [order.get_total_price() for order in self.__list_of_order()]
+        return [order.get_total_price() for order in self.__list_of_order]
 
 
 class Order:
@@ -604,16 +611,20 @@ def commentmenu(comment:CommentMenu):
         menu.add_comment(comment.commentmenu)
         return {"message":"comment menu successful"}
     return{"message":"Menu not found "}
-
 @app.get("/payment")
 def payment_menu():
     account_from = system.get_current_log_in()
-    account_to = cart.get_menu_id()
-    total_price = cart.get_total_price()
-    for i in range(account_to):
+    account_to = cart.get_menu_id()  # Make sure this returns a list
+    total_price = cart.get_total_price()  # Make sure this returns a list or iterable
+
+    # Assuming account_to and total_price are lists of equal length
+    payments = []
+    for i in range(len(account_to)):  # Loop through both account_to and total_price
         payment = Payment(account_from, account_to[i], total_price[i])
-        return payment.transfer(account_from, account_to, total_price[i])  
-    
+        payments.append(payment.transfer(account_from, account_to[i], total_price[i]))
+
+    return {"payments": payments}  # Return the results of all payments
+
 
 @app.get("/transaction")
 def transaction():
