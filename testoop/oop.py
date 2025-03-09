@@ -127,6 +127,12 @@ class System:
             if menu.get_menu_id() == menu_id:
                 cost = menu.get_cost()
                 return cost
+    
+    def search_user_by_menu_id(self,menu_id):
+        for menu in self.__all_menus:
+            if menu.get_menu_id() == menu_id:
+                username = menu.get_name()
+                return username
 
 
     def show_notification(self):
@@ -348,20 +354,28 @@ class Payment:
         sender = None
         receiver = None
 
+        # Check if both account_from and account_to are different
+        if account_from == account_to:
+            return {"message": "Sender and receiver cannot be the same"}
+
         # Find sender and receiver from the list of all users
         for user in system.get_all_users():
             if user.get_username() == account_from:
                 sender = user  # Assign user object to sender
-                break  
-
-        for user in system.get_all_users():
-            if user.get_username() == account_to:
+            elif user.get_username() == account_to:
                 receiver = user  # Assign user object to receiver
-                break 
 
-        # If sender or receiver is not found, return an error message
-        if sender is None or receiver is None:
-            return {"message": "Sender or receiver not found"}
+            # If both are found, no need to continue looping
+            if sender and receiver:
+                break
+
+        # If sender is not found
+        if sender is None:
+            return {"message": "Sender not found"}
+
+        # If receiver is not found
+        if receiver is None:
+            return {"message": "Receiver not found"}
 
         # Check if sender has sufficient balance
         if sender.get_balance() >= amount:
@@ -377,7 +391,6 @@ class Payment:
             return {"message": "Transfer successful"}
 
         return {"message": "Insufficient balance"}
-
 
 class Donation(Payment):
     pass
@@ -613,17 +626,37 @@ def commentmenu(comment:CommentMenu):
     return{"message":"Menu not found "}
 @app.get("/payment")
 def payment_menu():
+    # Get the current logged-in account, assuming it's a single account object, not a list.
     account_from = system.get_current_log_in()
-    account_to = cart.get_menu_id()  # Make sure this returns a list
-    total_price = cart.get_total_price()  # Make sure this returns a list or iterable
 
-    # Assuming account_to and total_price are lists of equal length
+    # Get the menu ID and total price, assuming these are valid methods that return lists.
+    menu_id = [cart.get_menu_id()]  # Or just cart.get_menu_id() if it's already a list.
+    total_price = [cart.get_total_price()]  # Or just cart.get_total_price() if it's already a list.
+
+    # Ensure account_from is not a list and is properly formatted
+    if isinstance(account_from, list):
+        return {"message": "Invalid account data"}
+
     payments = []
-    for i in range(len(account_to)):  # Loop through both account_to and total_price
-        payment = Payment(account_from, account_to[i], total_price[i])
-        payments.append(payment.transfer(account_from, account_to[i], total_price[i]))
 
-    return {"payments": payments}  # Return the results of all payments
+    # Loop through the menu items to make payments.
+    for i in range(len(menu_id)):
+        # Ensure account_to is correctly retrieved from menu_id
+        account_to = system.search_user_by_menu_id(menu_id[i])
+        
+        # Ensure account_to is a list, handle it if necessary
+        if isinstance(account_to, list):
+            account_to = account_to[0]  # Assuming we're dealing with the first user if there are multiple
+        
+        # Create a Payment object and transfer funds
+        payment = Payment(account_from, account_to, total_price[i])
+        transfer_result = payment.transfer(account_from, account_to, total_price[i])
+        
+        # Add the result of the transfer to the payments list
+        payments.append(transfer_result)
+
+    return {"payments": payments}
+
 
 
 @app.get("/transaction")
