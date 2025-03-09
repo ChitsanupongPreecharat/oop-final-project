@@ -144,15 +144,23 @@
             <input id="size" type="text" placeholder="ขนาดสำหรับ">
         </div>
     </div>
-    
-    <div id="ingredients" class="section">
+    <div id="instructions" class="section">
         <div class="container">
-            <h2>ส่วนผสม</h2>
-            <div id="ingredients-container">
-                <input id="ingredients-input" type="text" placeholder="เช่น เนื้อหมู 1 กิโลกรัม ต่อลงมา">
+            <h2>คำอธิบายอาหาร</h2>
+            <div id="instructions-container">
+                <textarea id="detail" placeholder="ขั้นตอนที่ 1 ต่อลงมา"></textarea>
             </div>
         </div>
     </div>
+    <div id="instructions" class="section">
+        <div class="container">
+            <h2>วัตถุดิบ</h2>
+            <div id="instructions-container">
+                <textarea id="ingredients-input" placeholder="ขั้นตอนที่ 1 ต่อลงมา"></textarea>
+            </div>
+        </div>
+    </div>
+   
     
     <div id="instructions" class="section">
         <div class="container">
@@ -225,7 +233,9 @@
                         async function add_menu() {
                             const name = document.getElementById('Menu_name').value.trim();
                             const size = document.getElementById('size').value.trim();
-                            const ingredients = document.getElementById('ingredients-input').value.trim(); // Fixed
+                            const ingredients = document.getElementById('ingredients-input').value.trim();
+                            const detail = document.getElementById('detail').value.trim();
+                            
                             const how_to = document.getElementById('instructions-input').value.trim(); // Fixed
                             const preparing_time = document.getElementById('preparing_time').value.trim();
                             const making_time = document.getElementById('making_time').value.trim();
@@ -241,6 +251,8 @@
                                     body: JSON.stringify({ 
                                         name, 
                                         how_to, 
+                                        ingredients,
+                                        detail,
                                         preparing_time, 
                                         making_time, 
                                         size, 
