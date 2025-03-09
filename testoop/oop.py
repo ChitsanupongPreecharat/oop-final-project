@@ -13,7 +13,7 @@ class System:
         self.__transaction = []
         self.__next_menu_id = 1
         self.__next_user_id = 1
-        self.__notificatoin_id = 1
+        self.__notification_id = 1
         self.__transaction_id =1
         self.__current_log_in = None
         
@@ -38,7 +38,7 @@ class System:
         else:
             new_menu = Menu(self.__next_menu_id, name, owner, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin)
             self.__all_menus.append(new_menu)
-            new_notification = Notification(self.__notificatoin_id, owner, "New menu added", f"New menu {name} added by {owner}")
+            new_notification = Notification(self.__notification_id, owner, "New menu added", f"New menu {name} added by {owner}")
             self.add_notification(new_notification)
             self.__next_menu_id += 1  
             return {"message": "Menu added successfully", "menu_id": new_menu.get_menu_id()}
@@ -94,7 +94,7 @@ class System:
 
     def add_notification(self, notification: 'Notification'):
         self.__all_notification.append(notification)
-        self.__notificatoin_id += 1
+        self.__notification_id += 1
 
     def add_promotion(self, promotion: 'Promotion'):
         self.__promotion.append(promotion)
@@ -127,6 +127,12 @@ class System:
             if menu.get_menu_id() == menu_id:
                 cost = menu.get_cost()
                 return cost
+    
+    def search_user_by_menu_id(self,menu_id):
+        for menu in self.__all_menus:
+            if menu.get_menu_id() == menu_id:
+                username = menu.get_name()
+                return username
 
 
     def show_notification(self):
@@ -204,7 +210,7 @@ class Nonmember(User):
         else:
             system.add_user(username, password)
             system.log_in(username,password)
-            system.add_notification(Notification(system._System__notificatoin_id, username, "register successfully", f"Username {username} register sucessfully"))
+            system.add_notification(Notification(system._System__notification_id, username, "register successfully", f"Username {username} register sucessfully"))
             return True
 
 class Account(User):
@@ -247,7 +253,7 @@ class Admin(Account):
         if self.validate_admin(username, password):
             system.add_user(username, password)
             system.log_in(username,password)
-            system.add_notification(Notification(system._System__notificatoin_id, username, "register successfully", f"Usrename {username} register sucessfully"))
+            system.add_notification(Notification(system._System__notification_id, username, "register successfully", f"Usrename {username} register sucessfully"))
             return True
         return False
     
@@ -343,35 +349,49 @@ class Payment:
     def get_account_form(self):
         return self.__account_form    
 
-    def transfer(self, sender,receiver, amount: int):
+    def transfer(self, account_from, account_to, amount: int):
+        # Initialize sender and receiver as None
         sender = None
         receiver = None
 
-        
-        for user in system.get_all_users():
-            if user.get_username() == self.__account_from:
-                sender = user
-                break  
+        # Check if both account_from and account_to are different
+        if account_from == account_to:
+            return {"message": "Sender and receiver cannot be the same"}
 
-        
-        for user in system.get_all_users():
-            if user.get_username() == self.__account_to:
-                receiver = user
-                break 
+        # Create a dictionary for fast lookup
+        user_dict = {user.get_username(): user for user in system.get_all_users()}
 
-        
-        if sender is None or receiver is None:
-            return {"message": "Sender or receiver not found"}
+        # Find sender and receiver
+        sender = user_dict.get(account_from)
+        receiver = user_dict.get(account_to)
 
+        # If sender or receiver is not found
+        if not sender:
+            return {"message": "Sender not found"}
+        if not receiver:
+            return {"message": "Receiver not found"}
+
+        # Check if the amount is valid
+        if amount <= 0:
+            return {"message": "Invalid transfer amount"}
+
+        # Check if sender has sufficient balance
         if sender.get_balance() >= amount:
-            sender.decrease_balance(amount)  
-            receiver.increase_balance(amount)
-            system.add_transaction(Transaction(system._System__transaction_id,sender.get_username(),receiver.get_username(),amount,"payment"))  
-            system.add_notification(Notification(system._System__notificatoin_id, sender.get_username(), "payment successful", f"User {sender.get_username()} payment successful"))
+            sender.decrease_balance(amount)  # Deduct amount from sender
+            receiver.increase_balance(amount)  # Add amount to receiver
+            
+            # Add the transaction to the system
+            transaction_id = system.generate_transaction_id()
+            system.add_transaction(Transaction(transaction_id, sender.get_username(), receiver.get_username(), amount, "payment"))
+            
+            # Add a notification for sender
+            notification_id = system.generate_notification_id()
+            system.add_notification(Notification(notification_id, sender.get_username(), "payment successful", f"User {sender.get_username()} payment successful"))
 
-            return {"message": "Transfer successful"}
+            return {"message": "Transfer successful", "transaction_id": transaction_id, "amount": amount}
 
         return {"message": "Insufficient balance"}
+
 
 class Donation(Payment):
     pass
@@ -388,6 +408,12 @@ class Cart:
     def get_list_of_order(self):
         
         return [order.get_order_details() for order in self.__list_of_order]
+    
+    def get_menu_id(self):
+        return [order.get_menu_id() for order in self.__list_of_order]
+    
+    def get_total_price(self):
+        return [order.get_total_price() for order in self.__list_of_order]
 
 
 class Order:
@@ -409,6 +435,10 @@ class Order:
             "num": self.__num,
             "total_price": self.get_total_price()
         }
+    
+    def get_menu_id(self):
+        return self.__menu_id
+    
         
 
 system = System()
@@ -519,7 +549,7 @@ def top_up(top_up_money:Top_up_money):
     for user in system.get_all_users():
         if user.get_username() == account:
             user.increase_balance(top_up_money.amount)
-            system.add_notification(Notification(system._System__notificatoin_id, user.get_username(), "Money deposit", f"User {user.get_username()} money deposit {top_up_money.amount} Bath"))
+            system.add_notification(Notification(system._System__notification_id, user.get_username(), "Money deposit", f"User {user.get_username()} money deposit {top_up_money.amount} Bath"))
             return {"message":"increase balance sucessful"}
     return {"message":"Uesr not found"}    
 
@@ -535,14 +565,14 @@ def search_menu(menu:str = Query(...,description="menu to search")):
 def get_waiting_for_approval_menu():
     return [menu.__dict__ for menu in system.get_waiting_for_approval_menu()]
 
-@app.get("/approve_menu/{menu_id}")
+@app.post("/approve_menu/{menu_id}")
 def approve_menu(menu_id: int):
     menu = system.search_menu_by_id(menu_id)
     if menu is None:
         return {"message": "Menu id not found"}
     else:
         menu._Menu__checked_by_admin = True
-        system.add_notification(Notification(system._System__notificatoin_id, menu.get_owner(), "Menu approved", f"Menu {menu.get_name()} approved by admin"))
+        system.add_notification(Notification(system._System__notification_id, menu.get_owner(), "Menu approved", f"Menu {menu.get_name()} approved by admin"))
         
         return {"message": "Menu approved"}
     
@@ -553,7 +583,7 @@ def delete_menu(menu_id: int):
         return {"message": "Menu id not found"}
     else:
         system._System__all_menus.remove(menu)
-        system.add_notification(Notification(system._System__notificatoin_id, menu.get_owner(), "Menu dejected", f"Menu {menu.get_name()} dejected by admin"))
+        system.add_notification(Notification(system._System__notification_id, menu.get_owner(), "Menu dejected", f"Menu {menu.get_name()} dejected by admin"))
         return {"message": "Menu deleted "}    
     
 
@@ -595,13 +625,40 @@ def commentmenu(comment:CommentMenu):
         menu.add_comment(comment.commentmenu)
         return {"message":"comment menu successful"}
     return{"message":"Menu not found "}
-
-@app.post("/payment")
-def payment_menu(payment_data: PaymentMenu):
-    account_from = system.get_current_log_in()
-    payment = Payment(account_from, payment_data.account_to, payment_data.amount)
+@app.get("/payment")
+def payment_menu():
     
-    return payment.transfer(account_from, payment_data.account_to, payment_data.amount)  
+    account_from = system.get_current_log_in()
+
+    
+    menu_id = [cart.get_menu_id()] 
+    total_price = [cart.get_total_price()]  
+
+    
+    if isinstance(account_from, list):
+        return {"message": "Invalid account data"}
+
+    payments = []
+
+    
+    for i in range(len(menu_id)):
+        account_to = system.search_user_by_menu_id(menu_id[i])
+        if isinstance(account_to, list):
+            account_to = account_to[0]  
+        
+       
+        payment = Payment(account_from, account_to, total_price[i])
+        transfer_result = payment.transfer(account_from, account_to, total_price[i])
+        
+      
+        payments.append(transfer_result)
+
+    return {"payments": payments}
+       
+        
+        
+
+
 
 @app.get("/transaction")
 def transaction():
