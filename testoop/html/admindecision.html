@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wongnai</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
     <style>
         * {
             margin: 0;
@@ -137,6 +137,67 @@
             border: 1px solid #000;
             cursor: pointer;
         }
+        .menu-box {
+        
+        gap: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        overflow-x: auto; /* ให้สามารถเลื่อนในแนวนอนได้ */
+}
+
+.menu-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+    min-width: 150px; /* กำหนดขนาดขั้นต่ำ */
+    max-width: auto; /* ให้ขยายตามเนื้อหาภายใน */
+    box-sizing: border-box;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: inline-block; /* ให้แต่ละเมนูขยายขนาดตามเนื้อหาภายใน */
+    flex-shrink: 0; /* ป้องกันไม่ให้เมนูย่อขนาด */
+    white-space: normal; /* ให้ข้อความสามารถแบ่งบรรทัดได้ */
+    margin: 20px;
+}
+
+.menu-item img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.menu-item h3 {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.menu-item p {
+    color: #666;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.menu-item button {
+    padding: 10px 20px;
+    background-color: #ff9900;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.menu-item button:hover {
+    background-color: #e68900;
+}
+
+
     </style>
 </head>
 <body>
@@ -157,29 +218,17 @@
     <div class="container">
         <h2>Admin Approve Menu</h2>
         <div class="menu-box">
-            <p><strong>Menu ID:</strong> 1</p>
-            <p><strong>Name:</strong> เมนูที่ 1</p>
+            <h3>Menu</h3>
+            <ul>
+                <li id="menu_list"></li>
+            </ul>
         </div>
-        <div class="menu-box">
-            <p><strong>Menu ID:</strong> x</p>
-            <p><strong>Name:</strong> เมนูที่ x</p>
-        </div>
-        <div class="menu-box">
-            <p><strong>Menu ID:</strong> x</p>
-            <p><strong>Name:</strong> เมนูที่ x</p>
-        </div>
-        <div class="menu-box">
-            <p><strong>Menu ID:</strong> x</p>
-            <p><strong>Name:</strong> เมนูที่ x</p>
-        </div>
-        <div class="menu-box">
-            <p><strong>Menu ID:</strong> x</p>
-            <p><strong>Name:</strong> เมนูที่ x</p>
-        </div>
+        
+       
         <div class="action-box">
-            <input type="text" placeholder="ใส่ Menu ID">
-            <button class="approve-btn">Approve</button>
-            <button class="reject-btn">Reject</button>
+            <input id="menu_id" type="text" placeholder="ใส่ Menu ID">
+            <button onclick="approve()" class="approve-btn">Approve</button>
+            <button onclick="reject()" class="reject-btn">Reject</button>
         </div>
     </div>
     <script>
@@ -197,6 +246,125 @@
             }
             likeCountSpan.textContent = likeCount;
         }
+
+        async function get_menu() {
+    try {
+        let menu_list = document.getElementById('menu_list');  // ใช้ container สำหรับแสดงเมนู
+
+        if (!menu_list) {
+            console.error("Missing HTML element: menu_list.");
+            return;
+        }
+
+        const response = await fetch('http://127.0.0.1:8000/serach_not_approved_menu');  
+        const data = await response.json();
+
+        console.log("Data received from API:", data); // ตรวจสอบข้อมูลจาก API
+
+        // ล้างข้อมูลเก่าก่อน
+        menu_list.innerHTML = "";
+
+        // ถ้ามีเมนู ให้แสดงทั้งหมด
+        if (data && data.length > 0) {
+            data.forEach(item => {
+                let menuItem = document.createElement('div');
+                menuItem.classList.add('menu-item');
+                menuItem.innerHTML = `
+                    <p><strong>Menu ID:</strong> ${item._Menu__menu_id}</p>
+                    <p><strong>Name:</strong> ${item._Menu__name}</p>
+                    <p><strong>Owner:</strong> ${item._Menu__owner}</p>
+                    <p><strong>How to:</strong> ${item._Menu__how_to}</p>
+                    <p><strong>Preparing Time:</strong> ${item._Menu__preparing_time}</p>
+                    <p><strong>Making Item:</strong> ${item._Menu__making_itme}</p>
+                    <p><strong>Size:</strong> ${item._Menu__size}</p>
+                    <p><strong>Calories:</strong> ${item._Menu__calories}</p>
+                    <p><strong>Cost:</strong> ${item._Menu__cost} THB</p>
+                    
+                `;
+                menu_list.appendChild(menuItem);  // เพิ่มเมนูใน container
+            });
+        } else {
+            menu_list.innerHTML = "<p>No menus found</p>";  // ถ้าไม่มีเมนูเลย
+        }
+    } catch (error) {
+        console.error("Error fetching menu data:", error);
+    }
+}
+
+async function reject() {
+    
+    
+        // ดึงค่า menu_id จากอินพุตที่ผู้ใช้กรอก
+        const menu_id = document.getElementById('menu_id').value;
+
+        // ตรวจสอบว่า menu_id ถูกกรอกหรือไม่
+        if (!menu_id) {
+            alert('Please enter a valid Menu ID');
+            return;
+        }
+
+        try {
+            // ส่งคำขอ DELETE ไปยัง API
+            const response = await fetch(`http://127.0.0.1:8000/delete_menu/${menu_id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await response.json(); 
+
+            
+            if (response.ok) {
+                alert(data.message); 
+                window.location.href = 'admindecision.html';
+            } else {
+                alert('Failed to delete menu: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Something went wrong'); 
+        }
+    }
+
+
+async function approve() {
+    
+    const menu_id = document.getElementById('menu_id').value;
+
+    if (!menu_id) {
+        alert('Please enter a Menu ID');
+        return;
+    }
+
+    try {
+        
+        const response = await fetch(`http://127.0.0.1:8000/approve_menu/${menu_id}`, {
+            method: 'POST',  
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ menu_id })
+        });
+
+        const data = await response.json();  
+        if (response.ok) {
+            alert(data.message);  
+            window.location.href = 'admindecision.html';
+        } else {
+            alert('Failed to approve menu');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong');
+    }
+}
+
+
+
+
+get_menu();
+
     </script>
 </body>
 </html>

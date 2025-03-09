@@ -358,24 +358,22 @@ class Payment:
         if account_from == account_to:
             return {"message": "Sender and receiver cannot be the same"}
 
-        # Find sender and receiver from the list of all users
-        for user in system.get_all_users():
-            if user.get_username() == account_from:
-                sender = user  # Assign user object to sender
-            elif user.get_username() == account_to:
-                receiver = user  # Assign user object to receiver
+        # Create a dictionary for fast lookup
+        user_dict = {user.get_username(): user for user in system.get_all_users()}
 
-            # If both are found, no need to continue looping
-            if sender and receiver:
-                break
+        # Find sender and receiver
+        sender = user_dict.get(account_from)
+        receiver = user_dict.get(account_to)
 
-        # If sender is not found
-        if sender is None:
+        # If sender or receiver is not found
+        if not sender:
             return {"message": "Sender not found"}
-
-        # If receiver is not found
-        if receiver is None:
+        if not receiver:
             return {"message": "Receiver not found"}
+
+        # Check if the amount is valid
+        if amount <= 0:
+            return {"message": "Invalid transfer amount"}
 
         # Check if sender has sufficient balance
         if sender.get_balance() >= amount:
@@ -383,14 +381,17 @@ class Payment:
             receiver.increase_balance(amount)  # Add amount to receiver
             
             # Add the transaction to the system
-            system.add_transaction(Transaction(system._System__transaction_id, sender.get_username(), receiver.get_username(), amount, "payment"))
+            transaction_id = system.generate_transaction_id()
+            system.add_transaction(Transaction(transaction_id, sender.get_username(), receiver.get_username(), amount, "payment"))
             
             # Add a notification for sender
-            system.add_notification(Notification(system._System__notification_id, sender.get_username(), "payment successful", f"User {sender.get_username()} payment successful"))
+            notification_id = system.generate_notification_id()
+            system.add_notification(Notification(notification_id, sender.get_username(), "payment successful", f"User {sender.get_username()} payment successful"))
 
-            return {"message": "Transfer successful"}
+            return {"message": "Transfer successful", "transaction_id": transaction_id, "amount": amount}
 
         return {"message": "Insufficient balance"}
+
 
 class Donation(Payment):
     pass
@@ -564,7 +565,7 @@ def search_menu(menu:str = Query(...,description="menu to search")):
 def get_waiting_for_approval_menu():
     return [menu.__dict__ for menu in system.get_waiting_for_approval_menu()]
 
-@app.get("/approve_menu/{menu_id}")
+@app.post("/approve_menu/{menu_id}")
 def approve_menu(menu_id: int):
     menu = system.search_menu_by_id(menu_id)
     if menu is None:
@@ -626,36 +627,36 @@ def commentmenu(comment:CommentMenu):
     return{"message":"Menu not found "}
 @app.get("/payment")
 def payment_menu():
-    # Get the current logged-in account, assuming it's a single account object, not a list.
+    
     account_from = system.get_current_log_in()
 
-    # Get the menu ID and total price, assuming these are valid methods that return lists.
-    menu_id = [cart.get_menu_id()]  # Or just cart.get_menu_id() if it's already a list.
-    total_price = [cart.get_total_price()]  # Or just cart.get_total_price() if it's already a list.
+    
+    menu_id = [cart.get_menu_id()] 
+    total_price = [cart.get_total_price()]  
 
-    # Ensure account_from is not a list and is properly formatted
+    
     if isinstance(account_from, list):
         return {"message": "Invalid account data"}
 
     payments = []
 
-    # Loop through the menu items to make payments.
+    
     for i in range(len(menu_id)):
-        # Ensure account_to is correctly retrieved from menu_id
         account_to = system.search_user_by_menu_id(menu_id[i])
-        
-        # Ensure account_to is a list, handle it if necessary
         if isinstance(account_to, list):
-            account_to = account_to[0]  # Assuming we're dealing with the first user if there are multiple
+            account_to = account_to[0]  
         
-        # Create a Payment object and transfer funds
+       
         payment = Payment(account_from, account_to, total_price[i])
         transfer_result = payment.transfer(account_from, account_to, total_price[i])
         
-        # Add the result of the transfer to the payments list
+      
         payments.append(transfer_result)
 
     return {"payments": payments}
+       
+        
+        
 
 
 
