@@ -11,7 +11,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: Arial, sans-serif;
-            justify-content: space-between;
         }
         body {
             background-color: #f5f5f5;
@@ -19,7 +18,7 @@
         }
         header {
             display: flex;
-            justify-content: space-between; 
+            justify-content: space-between;
             align-items: center;
             padding: 20px;
             background: #ffffff;
@@ -28,6 +27,13 @@
         #img-wn {
             width: 120px;
             border-radius: 30px;
+            cursor: pointer;
+        }
+        #search-bar-container {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            align-items: center;
         }
         #search-bar {
             flex-grow: 1;
@@ -36,17 +42,11 @@
             border: 1px solid #ccc;
             border-radius: 20px;
             width: 100%;
-        }
-        #search-bar-container {
-            display: flex;
-            flex-grow: 1;
-            justify-content: center;
-            align-items: center;
+            font-size: 16px;
         }
         .top-buttons {
             display: flex;
             gap: 20px;
-            position: relative;
         }
         .top-buttons button {
             padding: 10px 20px;
@@ -72,17 +72,11 @@
         .top-buttons button:hover::after {
             width: 100%;
         }
-        .search-button{
-            margin: 0px;
-            border: none;
-            background-color: white;
-        }
         .categories {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin: 20px 0;
-            
         }
         .categories button {
             padding: 10px 20px;
@@ -92,57 +86,28 @@
             color: black;
             font-weight: bold;
             cursor: pointer;
-            
         }
-        .explore-button {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 15px;
-            background: black;
-            color: white;
-            border-radius: 20px;
-            font-size: 14px;
-            text-decoration: none;
-        }
-        #search-results {
-            width: 100%;
-            max-width: 400px;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
-            padding: 10px;
-            display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
-            position: absolute;
-            z-index: 10;   
-        }
-        .search-item {
-            padding: 5px;
-            cursor: pointer;
-        }
-        .search-item:hover {
-            background-color: #f0f0f0;
+        .section {
+            margin: 30px 0;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
-            background: #fff8e1;
+            background: #ffffff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            
+            margin-bottom: 30px;
+        }
+        .container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         .flex {
             display: flex;
             justify-content: center;
-            align-items: center;
-            
-        }
-        .container-box {
-            display: flex;
-            gap: 0px;
-            
+            gap: 20px;
+            flex-wrap: wrap;
         }
         .card {
             background-color: #ffedcc;
@@ -151,8 +116,9 @@
             text-align: center;
             width: 180px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
-        .icon {
+        .card .icon {
             font-size: 30px;
             margin-bottom: 10px;
         }
@@ -163,12 +129,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px; /* Add gap between buttons */
-        }
-        .lower-button-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
         }
         .button {
             display: flex;
@@ -184,7 +146,7 @@
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
         .button.like-active {
-            background-color: #ffcc66; /* Darker color for active like button */
+            background-color: #ffcc66;
         }
         .icon {
             font-size: 20px;
@@ -194,13 +156,33 @@
             font-size: 16px;
             font-weight: bold;
         }
+        #search-results {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+            padding: 10px;
+            display: none;
+            position: absolute;
+            z-index: 10;
+        }
+        .search-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .search-item:hover {
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body>
     <header>
-        <img id="img-wn" src="wongnai001.webp" alt="Wongnai">
-        <div id ="search-bar-container">
-            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)" 
+        <img id="img-wn" onclick="goToPage('mainafterlogin.html')" src="wongnai001.webp" alt="Wongnai">
+        <div id="search-bar-container">
+            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
             <div id="search-results"></div>
         </div>
         <div class="top-buttons">
@@ -218,93 +200,62 @@
 
     <div class="section">
         <div class="container">
-            <h2>วิธีทำ"xxxx"</h2>
-        </div>
-    </div>
-    <div class="flex">
-        <div class="container-box">
-            <div class="card">
-                <div class="icon">🍚</div>
-                <div class="bold">ระยะเวลาในการเตรียมของ:</div>
-                <div>xx นาที</div>
-            </div>
-            <div class="card">
-                <div class="icon">🍲</div>
-                <div class="bold">ระยะเวลาในการทำ:</div>
-                <div>xx นาที</div>
-            </div>
-            <div class="card">
-                <div class="icon">🔥</div>
-                <div class="bold">แคลอรี่:</div>
-                <div>xx กิโลแคลอรี่ / เสิร์ฟ</div>
-            </div>
-            <div class="card">
-                <div class="icon">🍴</div>
-                <div class="bold">ขนาด:</div>
-                <div>xx เสิร์ฟ</div>
-            </div>
-        </div>
-    </div>
-    <div class="section">
-        <div class="container">
-            <h2>วัตถุดิบ</h2>
-            <p>
-                1. <br>
-                2. <br>
-                3. <br>
-                4. <br>
-                5. <br>
-                6. <br>
-            </p>
-        </div>
-    </div>
-    <div class="section">
-        <div class="container">
             <h2>วิธีทำ</h2>
-            <p>
-                1. <br>
-                2. <br>
-                3. <br>
-                4. <br>
-                5. <br>
-                6. <br>
-            </p>
+            <p id="how_to"></p>
         </div>
     </div>
-    <div class="section">
-        <div class="container">
-            <h2>คำอธิบาย</h2>
-            <p>xx</p>
+    
+    <div class="flex">
+        <div class="card">
+            <div class="icon">🍚</div>
+            <div class="bold">ระยะเวลาในการเตรียมของ:</div>
+            <div id="preparing_time">xx นาที</div>
+        </div>
+        <div class="card">
+            <div class="icon">🍲</div>
+            <div class="bold">ระยะเวลาในการทำ:</div>
+            <div id="making_time">xx นาที</div>
+        </div>
+        <div class="card">
+            <div class="icon">🔥</div>
+            <div class="bold">แคลอรี่:</div>
+            <div id="calories">xx กิโลแคลอรี่ / เสิร์ฟ</div>
+        </div>
+        <div class="card">
+            <div class="icon">🍴</div>
+            <div class="bold">ขนาด:</div>
+            <div id="size">xx เสิร์ฟ</div>
+        </div>
+        <div class="card">
+            <div class="icon">🍴</div>
+            <div class="bold">ราคา:</div>
+            <div id="cost">xx บาท</div>
         </div>
     </div>
+
     <div class="lower-buttons">
-        <div class="lower-button-container">
-            <button class="button" onclick="toggleLike(this)">
-                <span class="icon">💬</span>
-                <span>Comment</span>
-            </button>
-            <button class="button" onclick="toggleLike(this)">
-                <span class="icon">👍</span>
-                <span>Like</span>
-                <span class="like-count">0</span>
-            </button>
-            <button class="button" onclick="toggleLike(this)">
-                <span class="icon">🛒</span>
-                <span>Add to Cart</span>
-            </button>
-        </div>
+        <button class="button" onclick="toggleLike(this)">
+            <span class="icon">💬</span>
+            <span>Comment</span>
+        </button>
+        <button class="button" onclick="toggleLike(this)">
+            <span class="icon">👍</span>
+            <span>Like</span>
+            <span class="like-count">0</span>
+        </button>
+        <button class="button" onclick="toggleLike(this)">
+            <span class="icon">🛒</span>
+            <span>Add to Cart</span>
+        </button>
     </div>
-    <div class = "comment">
+
+    <div class="comment">
         <div class="container">
             <h2>Comment</h2>
-            <p>
-                1.oakpdfoakdpa<br>
-                1.oakpdfoakdpa<br>
-                1.oakpdfoakdpa<br>
-                1.oakpdfoakdpa<br>
-            </p>
+            <p id="comment"></p>
         </div>
     </div>
+
     <script>
         function goToPage(page) {
             window.location.href = page;
@@ -320,6 +271,32 @@
             }
             likeCountSpan.textContent = likeCount;
         }
+
+        window.onload = function() {
+            const menuData = localStorage.getItem('menuData');
+
+            const how_to = document.getElementById('how_to');
+            const preparing_time = document.getElementById('preparing_time');
+            const making_time = document.getElementById('making_time');
+            const calories = document.getElementById('calories');
+            const size = document.getElementById('size');
+            const cost = document.getElementById('cost');
+            const comment = document.getElementById('comment');
+
+            if (menuData) {
+                const menu = JSON.parse(menuData);
+
+                how_to.innerHTML = menu._Menu__how_to;
+                preparing_time.innerHTML = menu._Menu__preparing_time;
+                making_time.innerHTML = menu._Menu__making_itme;
+                calories.innerHTML = menu._Menu__calories;
+                size.innerHTML = menu._Menu__size;
+                cost.innerHTML = menu._Menu__cost;
+                comment.innerHTML = menu._Menu__comments.join(", ");
+            } else {
+                console.log("No menu data found in localStorage.");
+            }
+        };
     </script>
 </body>
 </html>
