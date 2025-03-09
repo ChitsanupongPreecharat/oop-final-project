@@ -32,11 +32,11 @@ class System:
             return {"message": "User added successfully", "username": new_user.get_username()}
         
     
-    def add_menu(self, name, owner, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
+    def add_menu(self, name, owner, how_to,ingredients ,detail,preparing_time, making_itme, size, calories, cost, checked_by_admin):
         if owner != self.get_current_log_in():
             return {"message": "You are not logged in. Please log in first."}
         else:
-            new_menu = Menu(self.__next_menu_id, name, owner, how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin)
+            new_menu = Menu(self.__next_menu_id, name, owner, how_to,detail,ingredients, preparing_time, making_itme, size, calories, cost, checked_by_admin)
             self.__all_menus.append(new_menu)
             new_notification = Notification(self.__notification_id, owner, "New menu added", f"New menu {name} added by {owner}")
             self.add_notification(new_notification)
@@ -263,11 +263,13 @@ class Admin(Account):
         return super().get_balance()
 
 class Menu:
-    def __init__(self, menu_id, name, owner,how_to, preparing_time, making_itme, size, calories, cost, checked_by_admin):
+    def __init__(self, menu_id, name, owner,how_to,ingredients,detail, preparing_time, making_itme, size, calories, cost, checked_by_admin):
         self.__menu_id = menu_id
         self.__name = name
         self.__owner = owner
         self.__how_to = how_to
+        self.__ingredients = ingredients
+        self.__detail = detail
         self.__preparing_time = preparing_time
         self.__making_itme = making_itme
         self.__size = size
@@ -462,6 +464,8 @@ class MenuPage(BaseModel):
     # owner: str
     # menu_tag: str
     how_to: str
+    ingredients:str
+    detail:str
     preparing_time: str
     making_time: str
     size: str
@@ -503,7 +507,7 @@ def add_menu(menu: MenuPage = Body(...)):
     else:
         owner = system.get_current_log_in()
         return system.add_menu(
-        menu.name, owner, menu.how_to,
+        menu.name, owner, menu.how_to,menu.ingredients,menu.detail,
         menu.preparing_time, menu.making_time, menu.size,
         menu.calories, menu.cost, menu.checked_by_admin
     )
@@ -629,7 +633,7 @@ def likemenu(menu_id:int):
 
 @app.post("/CommentMenu")
 def commentmenu(comment:CommentMenu):
-    menu = system.search_menu_by_id(comment.menu_id)
+    menu = system.search_menu(comment.menu_id)
     if menu is not None:
         menu.add_comment(comment.commentmenu)
         return {"message":"comment menu successful"}
