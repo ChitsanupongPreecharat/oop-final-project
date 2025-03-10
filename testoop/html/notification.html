@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email UI Clone</title>
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            padding: 20px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #img-wn {
+            width: 120px;
+            border-radius: 30px;
+        }
+        #search-bar {
+            flex-grow: 1;
+            max-width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            width: 100%;
+        }
+        #search-bar-container {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            align-items: center;
+        }
+        .top-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .top-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #ff9900;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;   
+        }
+        .search-button{
+            margin: 0px;
+            border: none;
+            background-color: white;
+        }
+         .container-content {
+            display: flex;
+            height: 100vh;
+         }
+        .sidebar {
+            width: 300px;
+            background: #f0f0f0;
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .email-item {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .email-item:hover, .email-item.active {
+            background: #ffe0b2;
+        }
+        .email-content {
+            flex-grow: 1;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .email-header {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .email-body {
+            margin-top: 10px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <img id="img-wn" src="wongnai001.webp" alt="Wongnai">
+        <div id ="search-bar-container">
+            <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
+            <div id="search-results"></div>
+        </div>
+        <div class="top-buttons">
+            <button onclick="goToPage('registerpage.html')">Register</button>
+            <button onclick="Logout()">Log out</button>
+            <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
+        </div>
+    </header>
+    <div class = "container-content">
+        <div class="sidebar">
+            <div class="email-item active" onclick="showEmail(0)">xxxx<br> <small>Result of Money Transfer (Success)</small></div>
+            <div class="email-item" onclick="showEmail(1)">xxxx<br> <small>Result of Donation (Success)</small></div>
+            <div class="email-item" onclick="showEmail(2)">xxxx<br> <small>Result of Menu Requesting</small></div>
+        </div>
+        <div class="email-content" id="emailDisplay">
+            <div class="email-header">Jakkrit Itsara</div>
+            <div class="email-body">
+                <p><strong>Result of Money Transfer <span class="success">(Success)</span></strong></p>
+                <p>แจ้งผลการทำรายการชำระค่าสินค้าและบริการ (สำเร็จ)</p>
+                <p>วันที่ทำรายการ: 32/02/2098 13:43:07</p>
+                <p>เลขที่รายการ: xxxxxxxxxxxx</p>
+                <p>ชำระเงินจากบัญชี: xxx-x-xxxx-x</p>
+                <p>เพื่อเข้าบัญชีบริษัท: xxxx</p>
+                <p>รหัสอ้างอิง 1: xxxx</p>
+                <p>รหัสอ้างอิง 2: xxxx</p>
+                <p>จำนวนเงิน (บาท): xxxx</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const emails = [
+            {
+                header: "Jakkrit Itsara",
+                body: `<p><strong>Result of Money Transfer <span class="success">(Success)</span></strong></p>
+                       <p>แจ้งผลการทำรายการชำระค่าสินค้าและบริการ (สำเร็จ)</p>
+                       <p>วันที่ทำรายการ: 32/02/2098 13:43:07</p>
+                       <p>เลขที่รายการ: xxxxxxxxxxxx</p>
+                       <p>ชำระเงินจากบัญชี: xxx-x-x1234-x</p>
+                       <p>เพื่อเข้าบัญชีบริษัท: WONGNHOK</p>
+                       <p>รหัสอ้างอิง 1: ABCD123DCVA</p>
+                       <p>รหัสอ้างอิง 2: WXYZ789ZYXW</p>
+                       <p>จำนวนเงิน (บาท): 169.00</p>`
+            },
+            {
+                header: "Somjit Chidsai",
+                body: `<p><strong>Result of Donation <span class="success">(Success)</span></strong></p>
+                       <p>แจ้งผลการทำรายการบริจาค (สำเร็จ)</p>
+                       <p>วันที่ทำรายการ: 32/02/2098</p>
+                       <p>เลขที่รายการ: xxxxxxxxxxxx</p>
+                       <p>จำนวนเงิน (บาท): 500.00</p>`
+            },
+            {
+                header: "Jakkrit Itsara",
+                body: `<p><strong>Result of Menu Requesting</strong></p>
+                       <p>เมนู "ใช้งานชนิดหนอนผู้นำ" ของคุณผ่านการอนุมัติเรียบร้อยแล้ว</p>`
+            }
+        ];
+
+        function showEmail(index) {
+            document.querySelectorAll('.email-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            document.getElementById('emailDisplay').innerHTML = `
+                <div class="email-header">${emails[index].header}</div>
+                <div class="email-body">${emails[index].body}</div>
+            `;
+        }
+    </script>
+</body>
+</html>
