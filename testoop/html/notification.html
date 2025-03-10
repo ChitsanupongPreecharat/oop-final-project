@@ -49,121 +49,216 @@
             border: none;
             background-color: white;
         }
-         .container-content {
-            display: flex;
-            height: 100vh;
-         }
-        .sidebar {
-            width: 300px;
-            background: #f0f0f0;
-            padding: 20px;
-            height: 100%;
-            overflow-y: auto;
-        }
-        .email-item {
+         
+        .notifications-container {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        width: 50%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #notification-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .notification-item {
+        background-color: #e1f5fe;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .notification-item strong {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .notification-item small {
+        font-size: 14px;
+        color: #888;
+    }
+    #search-results {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 100px;
             padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
+            position: absolute;
+            z-index: 10;   
+        }   
+.search-item {
+    padding: 5px;
+    cursor: pointer;
+}
+.search-item:hover {
+    background-color: #f0f0f0;
+}
+        .admin-icon {
+            width: 30px;
+            height: 30px;
             cursor: pointer;
         }
-        .email-item:hover, .email-item.active {
-            background: #ffe0b2;
-        }
-        .email-content {
-            flex-grow: 1;
-            background: white;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .email-header {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .email-body {
-            margin-top: 10px;
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .success {
-            color: green;
-        }
-
     </style>
 </head>
 <body>
     <header>
-        <img id="img-wn" src="wongnai001.webp" alt="Wongnai">
+        <img id="img-wn" src="wongnai001.webp" alt="Wongnai" onclick="goToPage('mainafterlogin.html')">
         <div id ="search-bar-container">
             <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
-            <div id="search-results"></div>
+            <button id="search-results" onclick="showmenu()">
         </div>
         <div class="top-buttons">
-            <button onclick="goToPage('registerpage.html')">Register</button>
+            
             <button onclick="Logout()">Log out</button>
             <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
         </div>
     </header>
     <div class = "container-content">
-        <div class="sidebar">
-            <div class="email-item active" onclick="showEmail(0)">xxxx<br> <small>Result of Money Transfer (Success)</small></div>
-            <div class="email-item" onclick="showEmail(1)">xxxx<br> <small>Result of Donation (Success)</small></div>
-            <div class="email-item" onclick="showEmail(2)">xxxx<br> <small>Result of Menu Requesting</small></div>
+        
+        <div id="notifications-container" class="notifications-container">
+            <h3>Notifications</h3>
+            <ul id="notification-list"></ul>
         </div>
-        <div class="email-content" id="emailDisplay">
-            <div class="email-header">Jakkrit Itsara</div>
-            <div class="email-body">
-                <p><strong>Result of Money Transfer <span class="success">(Success)</span></strong></p>
-                <p>แจ้งผลการทำรายการชำระค่าสินค้าและบริการ (สำเร็จ)</p>
-                <p>วันที่ทำรายการ: 32/02/2098 13:43:07</p>
-                <p>เลขที่รายการ: xxxxxxxxxxxx</p>
-                <p>ชำระเงินจากบัญชี: xxx-x-xxxx-x</p>
-                <p>เพื่อเข้าบัญชีบริษัท: xxxx</p>
-                <p>รหัสอ้างอิง 1: xxxx</p>
-                <p>รหัสอ้างอิง 2: xxxx</p>
-                <p>จำนวนเงิน (บาท): xxxx</p>
-            </div>
-        </div>
+        
+        
     </div>
 
     <script>
-        const emails = [
-            {
-                header: "Jakkrit Itsara",
-                body: `<p><strong>Result of Money Transfer <span class="success">(Success)</span></strong></p>
-                       <p>แจ้งผลการทำรายการชำระค่าสินค้าและบริการ (สำเร็จ)</p>
-                       <p>วันที่ทำรายการ: 32/02/2098 13:43:07</p>
-                       <p>เลขที่รายการ: xxxxxxxxxxxx</p>
-                       <p>ชำระเงินจากบัญชี: xxx-x-x1234-x</p>
-                       <p>เพื่อเข้าบัญชีบริษัท: WONGNHOK</p>
-                       <p>รหัสอ้างอิง 1: ABCD123DCVA</p>
-                       <p>รหัสอ้างอิง 2: WXYZ789ZYXW</p>
-                       <p>จำนวนเงิน (บาท): 169.00</p>`
-            },
-            {
-                header: "Somjit Chidsai",
-                body: `<p><strong>Result of Donation <span class="success">(Success)</span></strong></p>
-                       <p>แจ้งผลการทำรายการบริจาค (สำเร็จ)</p>
-                       <p>วันที่ทำรายการ: 32/02/2098</p>
-                       <p>เลขที่รายการ: xxxxxxxxxxxx</p>
-                       <p>จำนวนเงิน (บาท): 500.00</p>`
-            },
-            {
-                header: "Jakkrit Itsara",
-                body: `<p><strong>Result of Menu Requesting</strong></p>
-                       <p>เมนู "ใช้งานชนิดหนอนผู้นำ" ของคุณผ่านการอนุมัติเรียบร้อยแล้ว</p>`
-            }
-        ];
-
-        function showEmail(index) {
-            document.querySelectorAll('.email-item').forEach((item, i) => {
-                item.classList.toggle('active', i === index);
-            });
-            document.getElementById('emailDisplay').innerHTML = `
-                <div class="email-header">${emails[index].header}</div>
-                <div class="email-body">${emails[index].body}</div>
-            `;
+         function goToPage(page) {
+            window.location.href = page;
         }
+        
+        async function fetchNotifications() {
+        try {
+            const response = await fetch('http://localhost:8000/show_notification');  // URL API ที่ให้ไว้
+            const notifications = await response.json();
+
+            const notificationList = document.getElementById('notification-list');
+
+            if (notifications && notifications.length > 0) {
+                notifications.forEach(notification => {
+                    const notificationItem = document.createElement('li');
+                    notificationItem.classList.add('notification-item');
+                    notificationItem.innerHTML = `
+                        <strong>${notification.topic}</strong>
+                        <p>${notification.message}</p>
+                        <small>From: ${notification.account_name}</small>
+                    `;
+                    notificationList.appendChild(notificationItem);
+                });
+            } else {
+                notificationList.innerHTML = '<li>No new notifications</li>';
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    }
+
+    // เรียกใช้ฟังก์ชันเมื่อหน้าโหลด
+    window.onload = function() {
+        fetchNotifications();
+    };
+    async function Logout() {
+    try {
+        
+        const response = await fetch(`http://localhost:8000/log_out`);
+        const data = await response.json();
+        if(data.message){
+            alert(data.message)
+            window.location.href = 'mainpage.html';
+        }
+        else{
+            alert("You already log out")
+        }
+
+        
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+}
+
+async function showmenu() {
+    try {
+        const menu = document.getElementById('search-bar').value.trim();
+
+        if (!menu) {
+            console.log("Please enter a menu.");
+            return;
+        }
+
+        const response = await fetch(`http://localhost:8000/showMenu?menu=${menu}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch menu");
+        }
+
+        const data = await response.json();
+        const resultsDiv = document.getElementById('search-results');
+        console.log(data.menu)
+        if (data.menu ) {
+            // เก็บข้อมูลเมนูใน localStorage
+            localStorage.setItem('menuData', JSON.stringify(data.menu));
+            // ไปยังหน้า showmenu.html
+            window.location.href = 'showmenu.html';
+        } else {
+            resultsDiv.innerHTML = `<div class="search-item">Menu not found</div>`;
+            resultsDiv.style.display = "block"; // Show message
+            console.log("Menu not found:", data.menu);
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+}
+
+async function searchMenu(event) {
+            if(event.key === 'Enter') {
+                try {
+
+                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+
+                if (!menu) {
+                    console.log("Please enter a menu.");
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:8000/searchMenu?menu=${menu}`);
+                const data = await response.json();
+
+                const resultsDiv = document.getElementById('search-results');
+
+                if (data.menu) {
+                    resultsDiv.innerHTML = `<div class="search-item">${data.menu}</div>`;
+                    resultsDiv.style.display = "block"; // Show results
+                    console.log("Menu found:", data.menu);
+                } else {
+                    resultsDiv.innerHTML = `<div class="search-item">menu not found</div>`;
+                    resultsDiv.style.display = "block"; // Show message
+                    console.log("Menu not found",data.menu);
+                }
+                } 
+                catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+        }
+}
+
+    document.addEventListener("click", function(event) {
+        let searchBar = document.getElementById('search-bar');
+        let searchResults = document.getElementById('search-results');
+
+        // Check if the clicked element is not the search bar or search results
+        if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
+            searchResults.style.display = "none"; // Hide results
+        }
+    });
     </script>
 </body>
 </html>

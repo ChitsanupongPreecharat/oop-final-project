@@ -192,6 +192,12 @@
             <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
         </div>
     </header>
+    <div class="section">
+        <div class="container">
+            <h2>คำอธิบาย</h2>
+            <p id="detail"></p>
+        </div>
+    </div>
     
    
     <div class="section">
@@ -268,9 +274,9 @@
         
         function refreshData() {
     const menuData = localStorage.getItem('menuData');
-
+    const ingredients = document.getElementById('detail');
     const how_to = document.getElementById('how_to');
-    const ingredients = document.getElementById('ingredients');
+    const detail = document.getElementById('ingredients');
     const preparing_time = document.getElementById('preparing_time');
     const making_time = document.getElementById('making_time');
     const calories = document.getElementById('calories');
@@ -285,9 +291,10 @@
         const menu = JSON.parse(menuData);
 
         how_to.innerHTML = menu._Menu__how_to;
+        detail.innerHTML = menu._Menu__detail;
         ingredients.innerHTML = menu._Menu__ingredients;
         preparing_time.innerHTML = menu._Menu__preparing_time;
-        making_time.innerHTML = menu._Menu__making_itme; // แก้ไขจาก `making_itme` เป็น `making_time`
+        making_time.innerHTML = menu._Menu__making_itme; 
         calories.innerHTML = menu._Menu__calories;
         size.innerHTML = menu._Menu__size;
         cost.innerHTML = menu._Menu__cost;

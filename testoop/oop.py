@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Body,Query
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+import urllib.parse
 app = FastAPI()
 
 class System:
@@ -164,17 +165,6 @@ class System:
         popular_menus = [menu for menu in self.__all_menus if menu.get_like() > 5]
         return popular_menus
 
-    def buy_food(self):
-        pass
-
-    def donate(self):
-        pass
-
-   
-
-    def append_item_to_cart(self):
-        pass
-
     def get_waiting_for_approval_menu(self):
          return [menu for menu in self.__all_menus if menu.is_checked_by_admin()==False]
     
@@ -192,8 +182,6 @@ class User:
         else:
             return False
 
-    # def log_in(self, username, password):
-    #     return self.validate(username, password)
 
     def get_username(self):
         return self.__name
@@ -325,9 +313,7 @@ class Notification:
         self.__topic = topic
         self.__message = message
 
-    # def add_notification(self, system: 'System'):
-    #     system.add_notification(self)
-        
+
 
 class Promotion:
     pass
@@ -339,7 +325,7 @@ class PromotionService(Promotion):
     pass
 
 class Transaction:
-    def __init__(self, transaction_id, account_from, account_to, amount, status): # status = 'transferred' or 'donate'
+    def __init__(self, transaction_id, account_from, account_to, amount, status): 
         self.__transaction_id = transaction_id
         self.__account_from = account_from
         self.__account_to = account_to
@@ -356,14 +342,11 @@ class Payment:
         return self.__account_form    
 
     def transfer(self, account_from, account_to, amount: int):
-        # ตรวจสอบว่า amount เป็นจำนวนที่ถูกต้อง
-        if not isinstance(amount, (int, float)):  # ตรวจสอบว่า amount เป็นตัวเลข
+        
+        if not isinstance(amount, (int, float)):
             return {"message": "Invalid transfer amount: Amount must be a number"}
         
-        # if amount <= 0:  # ตรวจสอบว่า amount น้อยกว่าหรือเท่ากับ 0
-        #     return {"message": "Invalid transfer amount: Amount must be greater than 0"}
-        
-        # ส่วนของการทำธุรกรรม
+       
         sender = account_from
         receiver = account_to
 
@@ -375,20 +358,19 @@ class Payment:
         if not receiver:
             return {"message": "Receiver not found"}
 
-        # ตรวจสอบยอดเงินของผู้โอน
+       
         if sender.get_balance() < amount:
             return {"message": "Insufficient balance"}
 
-        # ดำเนินการโอน
+       
         sender.decrease_balance(amount)
         receiver.increase_balance(amount)
 
-        # สร้าง transaction ID และบันทึกธุรกรรม
+      
         transaction_id = system.generate_transaction_id()
         transaction = Transaction(transaction_id, sender.get_username(), receiver.get_username(), amount, "payment")
         system.add_transaction(transaction)
 
-        # การแจ้งเตือน
         notification_id = system.generate_notification_id()
         system.add_notification(Notification(notification_id, sender.get_username(), "Payment successful", f"Payment of {amount} to {receiver.get_username()} was successful"))
 
@@ -401,7 +383,7 @@ class Donation(Payment):
 
 class Cart:
     def __init__(self):
-        self.__list_of_order = []  # เก็บรายการออเดอร์ทั้งหมด
+        self.__list_of_order = []  
 
     def append_order(self, order):
         self.__list_of_order.append(order)
@@ -453,6 +435,21 @@ system.log_in('admin','admin')
 payment = Payment("","",0)
 cart = Cart()
 order = Order(0,0,0)
+system.add_menu(
+        "ไข่หวานต้มหอมญี่ปุ่น", "admin", "ตั้งกระทะเทฟลอนโดยใช้ไฟอ่อน ๆ นำน้ำมันพืชเช็ดให้ทั่วกระทะ พอกระทะร้อน ยกกระทะขึ้นจากเตา จากนั้นตักไข่ใส่ลงไปพอให้ไข่เคลือบเป็นแผ่นบาง ๆ ทั่วกระทะเมื่อไข่เริ่มเซตตัวดีใช้พายปาดขอบด้านข้าง ค่อย ๆ ม้วนไข่หวานจนเกือบสุดขอบกระทะ จากนั้นใช้พายช่วยประคองไข่ม้วน ให้ถอยหลังมาจุดเริ่มต้นเช็ดกระทะด้วยน้ำมันอีกครั้งให้กระทะสะอาด ตักไข่ใส่ลงไป รอไข่เซตตัวแล้วม้วนต่อจนจบ ทำซ้ำจนไข่หมดหรือได้ความหนาตามต้องการเมื่อไข่หวานได้ความหนาตามต้องการแล้ว ตะแคงกระทะไปมาให้ครบทุกด้านเพื่อจัดทรงให้เป็นชิ้นสี่เหลี่ยม และให้เนื้อไข่หวานแน่นดี",
+        "มาอัปเกรดเมนูไข่หวานให้ดีต่อสุขภาพ กับเมนู “ไข่หวานต้นหอมญี่ปุ่น” ที่แฝงต้นหอมหวานกรอบไว้ในเนื้อไข่ม้วนนุ่มฟู เด็ก ๆ ที่ไม่ชอบกินผักยังเทใจให้เลยค่ะ โดยวันนี้เราเลือกใช้ aro ต้นหอมญี่ปุ่นอินทรีย์ ที่ให้โปรตีนสูง พร้อมอุดมไปด้วยวิตามินและสารอาหารหลากหลายชนิด เป็นการเพิ่มประโยชน์ในมื้ออาหารแบบง่าย ๆ ใคร ๆ ก็ทำเองได้ที่บ้านแน่นอนค่ะ ถ้าทุกคนพร้อมกันแล้ว มาจดสูตรไข่หวานต้นหอมญี่ปุ่นกันเลยดีกว่า! มาอัปเกรดเมนูไข่หวานให้ดีต่อสุขภาพ กับเมนู “ไข่หวานต้นหอมญี่ปุ่น” ที่แฝงต้นหอมหวานกรอบไว้ในเนื้อไข่ม้วนนุ่มฟู เด็ก ๆ ที่ไม่ชอบกินผักยังเทใจให้เลยค่ะ โดยวันนี้เราเลือกใช้ aro ต้นหอมญี่ปุ่นอินทรีย์ ที่ให้โปรตีนสูง พร้อมอุดมไปด้วยวิตามินและสารอาหารหลากหลายชนิด เป็นการเพิ่มประโยชน์ในมื้ออาหารแบบง่าย ๆ ใคร ๆ ก็ทำเองได้ที่บ้านแน่นอนค่ะ ถ้าทุกคนพร้อมกันแล้ว มาจดสูตรไข่หวานต้นหอมญี่ปุ่นกันเลยดีกว่า!  ",
+        "aro ต้นหอมญี่ปุ่นอินทรีย์ 200 กรัม ไข่ไก่ 6 ฟอง โชยุ 1 ช้อนโต๊ะ  มิริน 1 ช้อนโต๊ะ น้ำตาล 1 ช้อนโต๊ะ น้ำสะอาด 50 กรัม",
+        '10 นาที', "20 นาที", "3 คน",
+        "260 Kcal/เสิร์ฟ ", 50, True
+    )
+system.add_menu(
+        "Mango Coconut Smoothie ", "admin", "ใส่เนื้อมะม่วงแช่แข็ง เนื้อมะพร้าว กะทิ เกลือ น้ำแข็ง ลงในโหลปั่น จากนั้นใส่ ไซรัปSenoritaกลิ่นมะม่วงอกร่องทองแล้วปั่นให้เข้ากัน อ่านต่อได้ที่ทใส่แก้วตามชอบตกแต่งด้วยเนื้อมะม่วงสุก เนื้อมะพร้าว ราดกะทิ ปิดท้ายด้วยสะระแหน่ แค่นี้ก็พร้อมเสิร์ฟแล้ว อ่านต่อได้ที่ ",
+        "ร้อนใจจะขาด ต้องการเครื่องดื่มเย็น ๆ สักแก้วดับกระหายเพิ่มพลังชีวิต! ตอนนี้ใครที่มีอาการเดียวกับน้องหลุมดำ มาค่ะมา! จะพาเข้าครัวไปทำน้ำปั่นกัน ร้อน ๆ แบบนี้จัดไปกับ “Mango Coconut Smoothie” มะม่วงสมูทตี้เนื้อเนียน หอม หวานกลมกล่อม หอมกลิ่นมะม่วงอกร่องด้วย “ไซรัป Senorita กลิ่นมะม่วงอกร่องทอง” เพิ่มความละมุนด้วยเนื้อมะพร้าวเน้น ๆ พร้อมตกแต่งด้วยเนื้อมะม่วงฉ่ำ ๆ ใครได้ลองก็ต้องขอเบิลแก้วที่สองแน่นอน ถ้าพร้อมแล้วมาจดสูตรค่า",
+        "ไซรัป Senorita กลิ่นมะม่วงอกร่องทอง 50 มิลลิลิตร เนื้อมะม่วงแช่แข็ง 300 กรัม เนื้อมะพร้าว 150 กรัม กะทิ 50 มิลลิลิตร เกลือ ½ ช้อนชา สะระแหน่ สำหรับตกแต่ง เนื้อมะม่วงสุก สำหรับตกแต่ง เนื้อมะพร้าว สำหรับตกแต่ง กะทิสำหรับตกแต่ง",
+        '10 นาที', "20 นาที", "2 คน",
+        "500 Kcal/เสิร์ฟ ", 50, True
+    )
+
 
 
 app.add_middleware(
@@ -465,8 +462,7 @@ app.add_middleware(
 
 class MenuPage(BaseModel):
     name: str
-    # owner: str
-    # menu_tag: str
+    
     how_to: str
     ingredients:str
     detail:str
@@ -486,17 +482,17 @@ class CommentMenu(BaseModel):
     commentmenu:str
 
 class PaymentMenu(BaseModel):
-    # account_from:str
+    
     account_to:str
     amount:int    
 
 class Top_up_money(BaseModel):
-    # account_id:int
+    
     amount:int    
 
 class AddOrder(BaseModel):
     menu_id:int
-    # price:int
+    
     num:int    
 
 
@@ -561,8 +557,9 @@ def top_up(top_up_money:Top_up_money):
 
 @app.get("/searchMenu")
 def search_menu(menu:str = Query(...,description="menu to search")):
+    decoded_menu = urllib.parse.unquote(menu)
     for m in system.get_all_menus():
-        if m.get_name() == menu and m._Menu__checked_by_admin == True:
+        if m.get_name() == decoded_menu and m._Menu__checked_by_admin == True:
             return {"menu":f"menu {m.get_name()} found"}
         
     return {"message":f"menu {menu} not found"}
@@ -614,7 +611,7 @@ def show_notification():
 
 @app.get("/current_log_in")
 def current_log_in():
-    # Fetch the current logged-in user
+    
     current_user = next((user for user in system.get_all_users() if user.get_username() == system.get_current_log_in()), None)
 
     if current_user:
@@ -647,10 +644,9 @@ def payment_menu():
     
     account_from = system.get_current_log_in()
 
-    # ตรวจสอบข้อมูลของ cart
-    menu_id = [cart.get_menu_id()]  # ควรจะเป็นลิสต์ของ menu_id
-    total_price = [order.get_total_price()]  # ควรจะเป็นลิสต์ของ total_price
-
+  
+    menu_id = [cart.get_menu_id()]  
+    total_price = [order.get_total_price()]  
     if total_price is None:
         return {"message": "total_price is None"}
     if isinstance(account_from, list):
@@ -658,25 +654,25 @@ def payment_menu():
 
     payments = []
 
-    # ควรเริ่มจาก 0 แทนที่จะเป็น 1 เพราะเราอาจจะมีเพียงแค่ 1 รายการใน menu_id และ total_price
-    for i in range(len(menu_id)):  # ใช้ len(menu_id) เพื่อหลีกเลี่ยงการเกิด IndexError
-        account_to = system.search_user_by_menu_id(menu_id[i])  # ค้นหาผู้รับ
+   
+    for i in range(len(menu_id)): 
+        account_to = system.search_user_by_menu_id(menu_id[i])  
         if isinstance(account_to, list):
-            account_to = account_to[0]  # เลือกบัญชีผู้รับแรก
+            account_to = account_to[0]  
             if account_to is None:
                 return {"message": "account_to None"}
 
-        # ตรวจสอบว่า total_price[i] เป็นลิสต์หรือไม่
+       
         if isinstance(total_price[i], list):
             if len(total_price[i]) > 0:
                 try:
-                    amount = int(total_price[i])  # แปลงจำนวนเงินจากลิสต์
+                    amount = int(total_price[i])  
                 except ValueError:
                     return {"message": f"Invalid amount value: {total_price[i]} is not a valid number"}
             else:
                 return {"message": f"Invalid amount: List is empty at index {i}"}
         else:
-            # ถ้าไม่ใช่ลิสต์ ก็ให้พยายามแปลงเป็นจำนวนเต็ม
+            
             try:
                 amount = int(total_price[i])
             except ValueError:
