@@ -242,7 +242,7 @@
         <button class="button" onclick="toggleLike(this)">
             <span class="icon">👍</span>
             <span>Like</span>
-            <span class="like-count">0</span>
+            <div id="like-count">0</div>
         </button>
         <button class="button" onclick="">
             <span class="icon">🛒</span>
@@ -258,77 +258,92 @@
     </div>
 
     <script>
-      async function toggleLike(button) {
-        // ดึงข้อมูลจาก localStorage
-        const menuData = localStorage.getItem('menuData');
-
-        // ตรวจสอบว่า menuData มีข้อมูลหรือไม่
-        if (!menuData) {
-            alert("No menu data found in localStorage.");
-            return;
+        function goToPage(page) {
+            window.location.href = page;
         }
+            
+        
+        function refreshData() {
+    const menuData = localStorage.getItem('menuData');
 
-        try {
-            // แปลงข้อมูล menuData จาก JSON string เป็น object และดึง menu_id
-            const menuId = JSON.parse(menuData)._Menu__menu_id;
+    const how_to = document.getElementById('how_to');
+    const ingredients = document.getElementById('ingredients');
+    const preparing_time = document.getElementById('preparing_time');
+    const making_time = document.getElementById('making_time');
+    const calories = document.getElementById('calories');
+    const size = document.getElementById('size');
+    const cost = document.getElementById('cost');
+    const comment = document.getElementById('comment');
+    const like = document.getElementById('like-count');
+    
 
-            // สร้าง URL ที่จะใช้ในการส่งคำขอไปยัง API ด้วย menu_id ใน path
-            const url = `http://127.0.0.1:8000/LikeMenu/${menuId}`;  // ส่ง menu_id ผ่าน path
 
-            // ส่งคำขอ GET ไปยัง API
-            const response = await fetch(url, {
-                method: 'GET',  // ใช้ GET request เพราะ API ของคุณเป็น GET
-                headers: {
-                    'Content-Type': 'application/json',  // ตั้งค่า headers ให้เป็น JSON
-                },
-            });
+    if (menuData) {
+        const menu = JSON.parse(menuData);
 
-            // ตรวจสอบว่า response สำเร็จหรือไม่
-            if (!response.ok) {
-                throw new Error("Failed to fetch data from the server");
-            }
+        how_to.innerHTML = menu._Menu__how_to;
+        ingredients.innerHTML = menu._Menu__ingredients;
+        preparing_time.innerHTML = menu._Menu__preparing_time;
+        making_time.innerHTML = menu._Menu__making_time; // แก้ไขจาก `making_itme` เป็น `making_time`
+        calories.innerHTML = menu._Menu__calories;
+        size.innerHTML = menu._Menu__size;
+        cost.innerHTML = menu._Menu__cost;
+        like.innerHTML = menu._Menu__like;
+        comment.innerHTML = menu._Menu__comments.join(", ");
+    } else {
+        console.log("No menu data found in localStorage.");
+    }
+}
 
-            // แปลงข้อมูลจาก response เป็น JSON
-            const data = await response.json();
+window.onload = function() {
+    refreshData();  // เรียกใช้ฟังก์ชัน refreshData เพื่อโหลดข้อมูลใหม่
+};
 
-            // แสดงข้อความที่ได้รับจาก API
-            alert(data.message);
+async function toggleLike(button) {
+    // ดึงข้อมูลจาก localStorage
+    const menuData = localStorage.getItem('menuData');
 
-        } catch (error) {
-            console.error("Error fetching data: ", error);
-            alert("An error occurred while fetching data.");
-        }
+    // ตรวจสอบว่า menuData มีข้อมูลหรือไม่
+    if (!menuData) {
+        alert("No menu data found in localStorage.");
+        return;
     }
 
+    try {
+        // แปลงข้อมูล menuData จาก JSON string เป็น object และดึง menu_id
+        const menuId = JSON.parse(menuData)._Menu__menu_id;
 
+        // สร้าง URL ที่จะใช้ในการส่งคำขอไปยัง API ด้วย menu_id ใน path
+        const url = `http://127.0.0.1:8000/LikeMenu/${menuId}`;  // ส่ง menu_id ผ่าน path
 
-        window.onload = function() {
-            const menuData = localStorage.getItem('menuData');
+        // ส่งคำขอ GET ไปยัง API
+        const response = await fetch(url, {
+            method: 'GET',  // ใช้ GET request เพราะ API ของคุณเป็น GET
+            headers: {
+                'Content-Type': 'application/json',  // ตั้งค่า headers ให้เป็น JSON
+            },
+        });
 
-            const how_to = document.getElementById('how_to');
-            const ingredients = document.getElementById('ingredients');
-            const preparing_time = document.getElementById('preparing_time');
-            const making_time = document.getElementById('making_time');
-            const calories = document.getElementById('calories');
-            const size = document.getElementById('size');
-            const cost = document.getElementById('cost');
-            const comment = document.getElementById('comment');
+        // ตรวจสอบว่า response สำเร็จหรือไม่
+        if (!response.ok) {
+            throw new Error("Failed to fetch data from the server");
+        }
 
-            if (menuData) {
-                const menu = JSON.parse(menuData);
+        // แปลงข้อมูลจาก response เป็น JSON
+        const data = await response.json();
 
-                how_to.innerHTML = menu._Menu__how_to;
-                ingredients.innerHTML = menu._Menu__ingredients;
-                preparing_time.innerHTML = menu._Menu__preparing_time;
-                making_time.innerHTML = menu._Menu__making_itme;
-                calories.innerHTML = menu._Menu__calories;
-                size.innerHTML = menu._Menu__size;
-                cost.innerHTML = menu._Menu__cost;
-                comment.innerHTML = menu._Menu__comments.join(", ");
-            } else {
-                console.log("No menu data found in localStorage.");
-            }
-        };
+        // แสดงข้อความที่ได้รับจาก API
+        alert(data.message);
+
+        // เรียกใช้ฟังก์ชัน refreshData เพื่อโหลดข้อมูลใหม่หลังจากทำงานเสร็จ
+        refreshData();
+
+    } catch (error) {
+        console.error("Error fetching data: ", error);
+        alert("An error occurred while fetching data.");
+    }
+}
+
     </script>
 </body>
 </html>
