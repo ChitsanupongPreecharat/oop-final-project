@@ -213,7 +213,14 @@
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
+/* .notification-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 20px;
+    
+} */
 /* ปรับแต่งปุ่มให้ดูดีขึ้น */
 button {
     width: 100%;
@@ -237,17 +244,21 @@ button:hover {
 <body>
     <Navbar>
         <header>
+            
             <img id="img-wn" onclick ="goToPage('mainafterlogin.html')" src="wongnai001.webp" alt="Wongnai">
             <div id ="search-bar-container">
                 <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
                 <div id="search-results"></div>
+                
             </div>
             <div id="top-buttons">
                 
                 <button onclick="goToPage('Addmenu.html')">Make your Recipe</button>
             </div>
+            
         </header>
     </Navbar>
+    
     <proacc-container>
         <div class="container-wrapper">
             <div class="profile-container">
