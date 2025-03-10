@@ -121,18 +121,22 @@ class System:
         for menu in self.__all_menus:
             if menu.get_menu_id() == menu_id:
                 return menu
+        return None    
             
     def search_cost_by_menu_id(self,menu_id):
         for menu in self.__all_menus:
             if menu.get_menu_id() == menu_id:
                 cost = menu.get_cost()
                 return cost
+        return None    
+            
     
     def search_user_by_menu_id(self,menu_id):
         for menu in self.__all_menus:
             if menu.get_menu_id() == menu_id:
                 username = menu.get_name()
                 return username
+        return None    
 
 
     def show_notification(self):
@@ -633,7 +637,7 @@ def likemenu(menu_id:int):
 
 @app.post("/CommentMenu")
 def commentmenu(comment:CommentMenu):
-    menu = system.search_menu(comment.menu_id)
+    menu = system.search_menu_by_id(comment.menu_id)
     if menu is not None:
         menu.add_comment(comment.commentmenu)
         return {"message":"comment menu successful"}
