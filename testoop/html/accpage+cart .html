@@ -38,7 +38,7 @@
         margin-top: 13px;
     }
     #search-bar {
-        /* flex-grow: 1; */
+        
         max-width: 60%;
         padding: 10px;
         border: 1px solid #ccc;
@@ -102,12 +102,13 @@
             width: 100%;
             max-width: 400px;
             background: white;
+            color: black;
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-top: 100px;
             padding: 10px;
-            display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
+            display: none; 
             position: absolute;
             z-index: 10;           
         }   
@@ -176,8 +177,8 @@
         padding: 10px;
         border-bottom: 1px solid #ddd;
         display: flex;
-        flex-direction: column; /* จัดเรียงจากบนลงล่าง */
-        justify-content: space-between; /* ช่องว่างระหว่างไอเท็ม */
+        flex-direction: column; 
+        justify-content: space-between; 
         height: 300px;
     }
     .cart-container button {
@@ -187,16 +188,16 @@
         padding: 10px 20px;
         cursor: pointer;
     }
-   /* จัด Layout ให้ Profile และ Shopping Cart */
+   
 .container-wrapper {
     display: flex;
-    justify-content: center; /* จัดให้อยู่ตรงกลาง */
+    justify-content: center;
     align-items: flex-start;
-    gap: 30px; /* ระยะห่างระหว่าง Profile และ Shopping Cart */
+    gap: 30px; 
     padding: 20px;
 }
 
-/* Profile Box */
+
 .profile-container {
     width: 40%;
     background: white;
@@ -205,7 +206,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Shopping Cart Box */
+
 .cart-container {
     width: 40%;
     background: white;
@@ -214,7 +215,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* ปรับแต่งปุ่มให้ดูดีขึ้น */
+
 button {
     width: 100%;
     background-color: #FFA500;
@@ -236,6 +237,8 @@ img {
     margin-top: 15px;
   }
 
+  
+
 </style>
 </html>
 <body>
@@ -244,7 +247,9 @@ img {
             <img id="img-wn" onclick ="goToPage('mainafterlogin.html')" src="wongnai001.webp" alt="Wongnai">
             <div id ="search-bar-container">
                 <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
-                <div id="search-results"></div>
+                <button id="search-results" color="black" onclick="showmenu() ">
+
+                </button>
             </div>
             <div id="top-buttons">
                 <img src="noti.png"onclick ="goToPage('notification.html')" src="images.png" width="30" alt="Profile" width="-จ" >
@@ -283,16 +288,46 @@ img {
                 <ul>
                     <li id="cart">1</li>
                 </ul>
-                <button onclick="goToPayment()">Payment</button>
+                <input type="number" id="menu_id" name="amount_top_up" min="1" step="1" placeholder="Enter menu id to payment">
+                <button onclick="Payment()">Payment</button>
             </div>
         </div>
     </proacc-container>
     <script>
         
 
-        function goToPayment() {
-            alert('Proceeding to payment');
+        async function Payment() {
+            
+            try {
+                let menu_id = document.getElementById('menu_id').value;
+
+                const response = await fetch('http://127.0.0.1:8000/payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        menu_id: menu_id 
+                    }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert(data.message);
+                window.location.href = 'accpage+cart .html';
+            } else {
+                
+                const errorData = await response.json();
+                console.error("Error fetching data:", errorData);
+                alert('Failed to payment. Please try again.');
+            }
+        } catch (error) {
+            
+            console.error('Error occurred:', error);
+            alert('An error occurred while adding the menu. Please try again.');
         }
+}
+
         function goToPage(page) {
         window.location.href = page;
     }
@@ -365,7 +400,7 @@ async function TopUP() {
 
         if (response.ok) {
             const data = await response.json();
-            // alert(data.message);
+           
             window.location.href = 'accpage+cart .html';
         } else {
             
@@ -383,7 +418,7 @@ async function searchMenu(event) {
             if(event.key === 'Enter') {
                 try {
 
-                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+                const menu = document.getElementById('search-bar').value.trim(); 
 
                 if (!menu) {
                     console.log("Please enter a menu.");
@@ -397,11 +432,11 @@ async function searchMenu(event) {
 
                 if (data.menu) {
                     resultsDiv.innerHTML = `<div class="search-item">${data.menu}</div>`;
-                    resultsDiv.style.display = "block"; // Show results
+                    resultsDiv.style.display = "block";
                     console.log("Menu found:", data.menu);
                 } else {
                     resultsDiv.innerHTML = `<div class="search-item">menu not found</div>`;
-                    resultsDiv.style.display = "block"; // Show message
+                    resultsDiv.style.display = "block";
                     console.log("Menu not found",data.menu);
                 }
                 } 
@@ -415,13 +450,45 @@ document.addEventListener("click", function(event) {
         let searchBar = document.getElementById('search-bar');
         let searchResults = document.getElementById('search-results');
 
-        // Check if the clicked element is not the search bar or search results
+        
         if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
-            searchResults.style.display = "none"; // Hide results
+            searchResults.style.display = "none";
         }
     });
 
-  
+    async function showmenu() {
+    try {
+        const menu = document.getElementById('search-bar').value.trim();
+
+        if (!menu) {
+            console.log("Please enter a menu.");
+            return;
+        }
+
+        const response = await fetch(`http://localhost:8000/showMenu?menu=${menu}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch menu");
+        }
+
+        const data = await response.json();
+        const resultsDiv = document.getElementById('search-results');
+        console.log(data.menu)
+        if (data.menu ) {
+           
+            localStorage.setItem('menuData', JSON.stringify(data.menu));
+            
+            window.location.href = 'showmenu.html';
+            
+        } else {
+            resultsDiv.innerHTML = `<div class="search-item">Menu not found</div>`;
+            resultsDiv.style.display = "block"; 
+            console.log("Menu not found:", data.menu);
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+}
 
 
 fetchUserData();  

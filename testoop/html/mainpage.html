@@ -132,7 +132,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-top: 10px;
             padding: 10px;
-            display: none; /* ซ่อนผลลัพธ์เริ่มต้น */
+            display: none; 
             position: absolute;
             z-index: 10;   
         }   
@@ -194,7 +194,7 @@
             if(event.key === 'Enter') {
                 try {
 
-                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+                const menu = document.getElementById('search-bar').value.trim(); 
 
                 if (!menu) {
                     console.log("Please enter a menu.");
@@ -208,11 +208,11 @@
 
                 if (data.menu) {
                     resultsDiv.innerHTML = `<div class="search-item">${data.menu}</div>`;
-                    resultsDiv.style.display = "block"; // Show results
+                    resultsDiv.style.display = "block"; 
                     console.log("Menu found:", data.menu);
                 } else {
                     resultsDiv.innerHTML = `<div class="search-item">menu not found</div>`;
-                    resultsDiv.style.display = "block"; // Show message
+                    resultsDiv.style.display = "block"; 
                     console.log("Menu not found",data.menu);
                 }
                 } 
@@ -226,9 +226,9 @@
         let searchBar = document.getElementById('search-bar');
         let searchResults = document.getElementById('search-results');
 
-        // Check if the clicked element is not the search bar or search results
+        
         if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
-            searchResults.style.display = "none"; // Hide results
+            searchResults.style.display = "none"; 
         }
     });
 

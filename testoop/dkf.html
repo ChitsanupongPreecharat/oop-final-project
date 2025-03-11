@@ -46,3 +46,54 @@
 
 </body>
 </html>
+account_from = system.get_current_log_in()
+
+  
+    menu_id = [cart.get_menu_id()]  
+    total_price = [order.get_total_price()]  
+    if total_price is None:
+        return {"message": "total_price is None"}
+    if isinstance(account_from, list):
+        return {"message": "Invalid account data"}
+
+    payments = []
+
+   
+    for i in range(len(menu_id)): 
+        account_to = system.search_user_by_menu_id(menu_id[i])  
+        if isinstance(account_to, list):
+            account_to = account_to[0]  
+            if account_to is None:
+                return {"message": "account_to None"}
+
+       
+        if isinstance(total_price[i], list):
+            if len(total_price[i]) > 0:
+                try:
+                    amount = int(total_price[i])  
+                except ValueError:
+                    return {"message": f"Invalid amount value: {total_price[i]} is not a valid number"}
+            else:
+                return {"message": f"Invalid amount: List is empty at index {i}"}
+        else:
+            
+            try:
+                amount = int(total_price[i])
+            except ValueError:
+                return {"message": f"Invalid amount value: {total_price[i]} is not a valid number"}
+
+        # สร้างการทำธุรกรรมและโอนเงิน
+        payment = Payment(account_from, account_to, amount)
+        transfer_result = payment.transfer(account_from, account_to, amount)
+        payments.append(transfer_result)
+
+    return {"payments": payments}
+
+
+
+    if user.get_balance() < payment.amount:
+                return {"message":"Insufficient balance"}
+            else:
+                user.decrease_balance(payment.amount)
+                system.add_notification(Notification(system._System__notification_id, user.get_username(), "Payment", f"Payment {payment.amount} Bath"))
+                return {"message":"Payment successful"}

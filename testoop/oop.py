@@ -97,8 +97,7 @@ class System:
         self.__all_notification.append(notification)
         self.__notification_id += 1
 
-    def add_promotion(self, promotion: 'Promotion'):
-        self.__promotion.append(promotion)
+
 
     def get_all_menus(self):
         return [menu for menu in self.__all_menus if menu.is_checked_by_admin()]
@@ -132,13 +131,12 @@ class System:
         return None    
             
     
-    def search_user_by_menu_id(self,menu_id):
+    def search_user_by_menu_id(self, menu_id):
         for menu in self.__all_menus:
             if menu.get_menu_id() == menu_id:
-                username = menu.get_name()
-                return username
-        return None    
-
+                owner = menu.get_owner()
+                return owner
+        return None
 
     def show_notification(self):
         user = system.get_current_log_in()
@@ -226,8 +224,7 @@ class Account(User):
     def increase_balance(self,amount):
         self.__balance += amount    
 
-class Member(Account):
-    pass
+
 
 class Admin(Account):
     def __init__(self, account_id, name, password, transaction: 'Transaction', balance:int):
@@ -298,13 +295,7 @@ class Menu:
         return self.__cost
     
 
-class Tag(Menu):
-    def __init__(self, tag):
-        self.__tag = tag
-        self.__list_menu = []
 
-class Comment:
-    pass
 
 class Notification:
     def __init__(self, notification_id, account_name,topic, message):
@@ -315,14 +306,7 @@ class Notification:
 
 
 
-class Promotion:
-    pass
 
-class PromotionCode(Promotion):
-    pass
-
-class PromotionService(Promotion):
-    pass
 
 class Transaction:
     def __init__(self, transaction_id, account_from, account_to, amount, status): 
@@ -342,39 +326,20 @@ class Payment:
         return self.__account_form    
 
     def transfer(self, account_from, account_to, amount: int):
+        if account_from == account_to:
+            return {"message": "You can not transfer money to yourself"}
+        if account_from.get_balance() < amount:
+            return {"message": "Insufficient funds"}
+        else:
+            account_from.decrease_balance(amount)
+            account_to.increase_balance(amount)
+            
+            system.add_transaction(Transaction(system._System__transaction_id, account_from.get_username(), account_to.get_username(), amount, "Success"))
+            system.add_notification(Notification(system._System__notification_id, account_from.get_username(), "Money transfer", f"Transfer {amount} Bath to {account_to.get_username()}"))
+            system.add_notification(Notification(system._System__notification_id, account_to.get_username(), "Money received", f"Received {amount} Bath from {account_from.get_username()}"))
+            
+            return {"message": "Transfer successful"}
         
-        if not isinstance(amount, (int, float)):
-            return {"message": "Invalid transfer amount: Amount must be a number"}
-        
-       
-        sender = account_from
-        receiver = account_to
-
-        if sender == receiver:
-            return {"message": "Sender and receiver cannot be the same"}
-
-        if not sender:
-            return {"message": "Sender not found"}
-        if not receiver:
-            return {"message": "Receiver not found"}
-
-       
-        if sender.get_balance() < amount:
-            return {"message": "Insufficient balance"}
-
-       
-        sender.decrease_balance(amount)
-        receiver.increase_balance(amount)
-
-      
-        transaction_id = system.generate_transaction_id()
-        transaction = Transaction(transaction_id, sender.get_username(), receiver.get_username(), amount, "payment")
-        system.add_transaction(transaction)
-
-        notification_id = system.generate_notification_id()
-        system.add_notification(Notification(notification_id, sender.get_username(), "Payment successful", f"Payment of {amount} to {receiver.get_username()} was successful"))
-
-        return {"message": "Transfer successful", "transaction_id": transaction_id, "amount": amount}
 
 
 
@@ -399,6 +364,13 @@ class Cart:
     
     def get_total_price(self):
         return [order.get_total_price() for order in self.__list_of_order]
+    
+    def delete_order(self, order):
+        for existing_order in self.__list_of_order:
+            if existing_order.get_menu_id() == order.get_menu_id():
+                self.__list_of_order.remove(existing_order)
+                return {"message": "Delete order successful"}
+        return {"message": "Order not found"}
 
 
 class Order:
@@ -483,8 +455,8 @@ class CommentMenu(BaseModel):
 
 class PaymentMenu(BaseModel):
     
-    account_to:str
-    amount:int    
+    menu_id:int
+      
 
 class Top_up_money(BaseModel):
     
@@ -639,52 +611,22 @@ def commentmenu(comment:CommentMenu):
         menu.add_comment(comment.commentmenu)
         return {"message":"comment menu successful"}
     return{"message":"Menu not found "}
-@app.get("/payment")
-def payment_menu():
+@app.post("/payment")
+def payment_menu(paymentmenu: PaymentMenu):
+    account_from_username = system.get_current_log_in()
+    account_to_username = system.search_user_by_menu_id(paymentmenu.menu_id)
+    menu = system.search_menu_by_id(paymentmenu.menu_id)
+    amount = sum(cart.get_total_price())
+
+    account_from = next((user for user in system.get_all_users() if user.get_username() == account_from_username), None)
+    account_to = next((user for user in system.get_all_users() if user.get_username() == account_to_username), None)
+
+    if account_from and account_to:
+        cart.delete_order(menu)
+        return payment.transfer(account_from, account_to, amount)
+    return {"message": "User not found"}
     
-    account_from = system.get_current_log_in()
-
-  
-    menu_id = [cart.get_menu_id()]  
-    total_price = [order.get_total_price()]  
-    if total_price is None:
-        return {"message": "total_price is None"}
-    if isinstance(account_from, list):
-        return {"message": "Invalid account data"}
-
-    payments = []
-
-   
-    for i in range(len(menu_id)): 
-        account_to = system.search_user_by_menu_id(menu_id[i])  
-        if isinstance(account_to, list):
-            account_to = account_to[0]  
-            if account_to is None:
-                return {"message": "account_to None"}
-
-       
-        if isinstance(total_price[i], list):
-            if len(total_price[i]) > 0:
-                try:
-                    amount = int(total_price[i])  
-                except ValueError:
-                    return {"message": f"Invalid amount value: {total_price[i]} is not a valid number"}
-            else:
-                return {"message": f"Invalid amount: List is empty at index {i}"}
-        else:
-            
-            try:
-                amount = int(total_price[i])
-            except ValueError:
-                return {"message": f"Invalid amount value: {total_price[i]} is not a valid number"}
-
-        # สร้างการทำธุรกรรมและโอนเงิน
-        payment = Payment(account_from, account_to, amount)
-        transfer_result = payment.transfer(account_from, account_to, amount)
-        payments.append(transfer_result)
-
-    return {"payments": payments}
-
+    
       
 
        

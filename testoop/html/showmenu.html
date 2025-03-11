@@ -163,7 +163,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
+            margin-top: 100px;
             padding: 10px;
             display: none;
             position: absolute;
@@ -184,7 +184,9 @@
         <img id="img-wn" onclick="goToPage('mainafterlogin.html')" src="wongnai001.webp" alt="Wongnai">
         <div id="search-bar-container">
             <input type="text" id="search-bar" placeholder="Search your food" onkeydown="searchMenu(event)">
-            <div id="search-results"></div>
+            <button id="search-results" onclick="showmenu()">
+
+            </button>
         </div>
         <div class="top-buttons">
             <button onclick="goToPage('registerpage.html')">Register</button>
@@ -306,47 +308,47 @@
 }
 
 window.onload = function() {
-    refreshData();  // เรียกใช้ฟังก์ชัน refreshData เพื่อโหลดข้อมูลใหม่
+    refreshData();  
 };
 
 async function toggleLike(button) {
-    // ดึงข้อมูลจาก localStorage
+    
     const menuData = localStorage.getItem('menuData');
 
-    // ตรวจสอบว่า menuData มีข้อมูลหรือไม่
+  
     if (!menuData) {
         alert("No menu data found in localStorage.");
         return;
     }
 
     try {
-        // แปลงข้อมูล menuData จาก JSON string เป็น object และดึง menu_id
+        
         const menuId = JSON.parse(menuData)._Menu__menu_id;
 
-        // สร้าง URL ที่จะใช้ในการส่งคำขอไปยัง API ด้วย menu_id ใน path
-        const url = `http://127.0.0.1:8000/LikeMenu/${menuId}`;  // ส่ง menu_id ผ่าน path
+        
+        const url = `http://127.0.0.1:8000/LikeMenu/${menuId}`; 
 
-        // ส่งคำขอ GET ไปยัง API
+        
         const response = await fetch(url, {
-            method: 'GET',  // ใช้ GET request เพราะ API ของคุณเป็น GET
+            method: 'GET', 
             headers: {
-                'Content-Type': 'application/json',  // ตั้งค่า headers ให้เป็น JSON
+                'Content-Type': 'application/json', 
             },
         });
 
-        // ตรวจสอบว่า response สำเร็จหรือไม่
+       
         if (!response.ok) {
             throw new Error("Failed to fetch data from the server");
         }
 
-        // แปลงข้อมูลจาก response เป็น JSON
+        
         const data = await response.json();
 
-        // แสดงข้อความที่ได้รับจาก API
-        alert(data.message);
         
+        alert(data.message);
+        window.location.href = 'showmenu.html';
 
-        // เรียกใช้ฟังก์ชัน refreshData เพื่อโหลดข้อมูลใหม่หลังจากทำงานเสร็จ
+        
         refreshData();
 
     } catch (error) {
@@ -359,7 +361,7 @@ async function searchMenu(event) {
             if(event.key === 'Enter') {
                 try {
 
-                const menu = document.getElementById('search-bar').value.trim(); // Get input value safely
+                const menu = document.getElementById('search-bar').value.trim(); 
 
                 if (!menu) {
                     console.log("Please enter a menu.");
@@ -433,6 +435,7 @@ async function AddComment(event) {
 
                 if (data.message) {
                     alert(data.message);
+                    window.location.href = 'showmenu.html';
                 } else {
                     alert("Comment added successfully.");
                 }
@@ -497,6 +500,7 @@ async function AddCart(event) {
 
                 if (data.message) {
                     alert(data.message);
+                    window.location.href = 'showmenu.html';
                 } else {
                     alert("Order added successfully.");
                 }
@@ -513,7 +517,39 @@ async function AddCart(event) {
     }
 }
 
+async function showmenu() {
+    try {
+        const menu = document.getElementById('search-bar').value.trim();
 
+        if (!menu) {
+            console.log("Please enter a menu.");
+            return;
+        }
+
+        const response = await fetch(`http://localhost:8000/showMenu?menu=${menu}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch menu");
+        }
+
+        const data = await response.json();
+        const resultsDiv = document.getElementById('search-results');
+        console.log(data.menu)
+        if (data.menu ) {
+           
+            localStorage.setItem('menuData', JSON.stringify(data.menu));
+           
+            window.location.href = 'showmenu.html';
+            
+        } else {
+            resultsDiv.innerHTML = `<div class="search-item">Menu not found</div>`;
+            resultsDiv.style.display = "block"; 
+            console.log("Menu not found:", data.menu);
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+}
 
 
     </script>
